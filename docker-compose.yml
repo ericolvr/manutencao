@@ -1,0 +1,58 @@
+services:
+  postgres_database:
+    image: postgres:16-alpine
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER:-maintenance}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-maintenance}"
+      POSTGRES_DB: "${POSTGRES_DB:-maintenance}"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/1-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+  api:
+    image: maintenance:latest
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SERVER_PORT=${SERVER_PORT:-9999}
+      - ALLOW_ORIGINS=${ALLOW_ORIGINS}
+      - SECRET=${SECRET}
+      - ENV=${ENV:-deploy}
+    deploy:
+      replicas: ${API_REPLICAS:-2}
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+    ports:
+      - "${SERVER_PORT:-9999}:${SERVER_PORT:-9999}"
+    depends_on:
+      - postgres_database
+      
+volumes:
+  postgres:
+
+
+  

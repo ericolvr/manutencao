@@ -1,0 +1,661 @@
+{
+	"info": {
+		"_postman_id": "maintenance-v2-complete-v2",
+		"name": "Maintenance V2 - Complete API Collection (New Flow)",
+		"description": "Collection completa para testar o novo fluxo de negócio: criação de tickets básicos + associação posterior de providers, problems e solutions",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:9999/api/v1"
+		}
+	],
+	"item": [
+		{
+			"name": "🎯 NOVO FLUXO - Tickets Básicos",
+			"item": [
+				{
+					"name": "1. Create Basic Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"number\": \"TK-2025-001\",\n  \"status\": 12,\n  \"priority\": \"high\",\n  \"description\": \"Problema elétrico na sala 101\",\n  \"open_date\": \"2025-01-28T15:00:00Z\",\n  \"branch_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets"]
+						}
+					}
+				},
+				{
+					"name": "2. Get Ticket by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1"]
+						}
+					}
+				},
+				{
+					"name": "3. List All Tickets",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/tickets?limit=10&offset=0",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "4. Update Ticket",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"number\": \"TK-2025-001\",\n  \"status\": 13,\n  \"priority\": \"medium\",\n  \"description\": \"Problema elétrico na sala 101 - ATUALIZADO\",\n  \"open_date\": \"2025-01-28T15:00:00Z\",\n  \"branch_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1"]
+						}
+					}
+				},
+				{
+					"name": "5. Delete Ticket",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🔗 Ticket Providers",
+			"item": [
+				{
+					"name": "Add Provider to Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"provider_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/providers",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "providers"]
+						}
+					}
+				},
+				{
+					"name": "Get Provider on Ticket",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/providers",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "providers"]
+						}
+					}
+				},
+				{
+					"name": "Remove Provider from Ticket",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/providers",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "providers"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🔧 Ticket Problems",
+			"item": [
+				{
+					"name": "Add Problem to Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"problem_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/problems",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "problems"]
+						}
+					}
+				},
+				{
+					"name": "Get Ticket Problems",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/problems",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "problems"]
+						}
+					}
+				},
+				{
+					"name": "Remove Problem from Ticket",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/problems/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "problems", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "💰 Ticket Solutions (Custos)",
+			"item": [
+				{
+					"name": "Add Solution to Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"solution_id\": 1,\n  \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/solutions",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "solutions"]
+						}
+					}
+				},
+				{
+					"name": "Get Ticket Solutions",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/solutions",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "solutions"]
+						}
+					}
+				},
+				{
+					"name": "Remove Solution from Ticket",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/solutions/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "solutions", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🔧 Problems (Catálogo)",
+			"item": [
+				{
+					"name": "Create Problem",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Problema Elétrico\",\n  \"description\": \"Problemas relacionados ao sistema elétrico do prédio\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/problems",
+							"host": ["{{baseUrl}}"],
+							"path": ["problems"]
+						}
+					}
+				},
+				{
+					"name": "List Problems",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/problems?limit=10&offset=0",
+							"host": ["{{baseUrl}}"],
+							"path": ["problems"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Problem by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/problems/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["problems", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Problem",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Problema Elétrico - Atualizado\",\n  \"description\": \"Problemas relacionados ao sistema elétrico do prédio - descrição atualizada\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/problems/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["problems", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Problem",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/problems/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["problems", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "💡 Solutions (Catálogo)",
+			"item": [
+				{
+					"name": "Create Solution",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Troca de Lâmpada LED\",\n  \"description\": \"Substituição de lâmpadas queimadas por LED de alta eficiência\",\n  \"problem_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/solutions",
+							"host": ["{{baseUrl}}"],
+							"path": ["solutions"]
+						}
+					}
+				},
+				{
+					"name": "List Solutions",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/solutions?limit=10&offset=0",
+							"host": ["{{baseUrl}}"],
+							"path": ["solutions"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Solution by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/solutions/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["solutions", "1"]
+						}
+					}
+				},
+				{
+					"name": "Update Solution",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Troca de Lâmpada LED - Premium\",\n  \"description\": \"Substituição de lâmpadas queimadas por LED premium de alta eficiência\",\n  \"problem_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/solutions/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["solutions", "1"]
+						}
+					}
+				},
+				{
+					"name": "Delete Solution",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/solutions/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["solutions", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🏢 Other Entities",
+			"item": [
+				{
+					"name": "List Branches",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/branchs?limit=10&offset=0",
+							"host": ["{{baseUrl}}"],
+							"path": ["branchs"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "List Providers",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/providers?limit=10&offset=0",
+							"host": ["{{baseUrl}}"],
+							"path": ["providers"],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Provider",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Empresa de Manutenção XYZ\",\n  \"zipcode\": \"12345-678\",\n  \"address\": \"Rua das Flores, 123\",\n  \"complement\": \"Sala 101\",\n  \"neighborhood\": \"Centro\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"phone\": \"(11) 1234-5678\",\n  \"email\": \"contato@manutencaoxyz.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/providers",
+							"host": ["{{baseUrl}}"],
+							"path": ["providers"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "🎯 FLUXO COMPLETO - Exemplo",
+			"item": [
+				{
+					"name": "STEP 1: Create Problem",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Problema Elétrico\",\n  \"description\": \"Problemas relacionados ao sistema elétrico\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/problems",
+							"host": ["{{baseUrl}}"],
+							"path": ["problems"]
+						}
+					}
+				},
+				{
+					"name": "STEP 2: Create Solution",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Troca de Lâmpada LED\",\n  \"description\": \"Substituição de lâmpadas por LED\",\n  \"problem_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/solutions",
+							"host": ["{{baseUrl}}"],
+							"path": ["solutions"]
+						}
+					}
+				},
+				{
+					"name": "STEP 3: Create Provider",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Empresa Manutenção ABC\",\n  \"zipcode\": \"12345-678\",\n  \"address\": \"Rua das Flores, 123\",\n  \"complement\": \"\",\n  \"neighborhood\": \"Centro\",\n  \"city\": \"São Paulo\",\n  \"state\": \"SP\",\n  \"phone\": \"(11) 1234-5678\",\n  \"email\": \"contato@abc.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/providers",
+							"host": ["{{baseUrl}}"],
+							"path": ["providers"]
+						}
+					}
+				},
+				{
+					"name": "STEP 4: Create Basic Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"number\": \"TK-2025-FLOW\",\n  \"status\": 12,\n  \"priority\": \"high\",\n  \"description\": \"Lâmpada queimada na sala 101\",\n  \"open_date\": \"2025-01-28T15:00:00Z\",\n  \"branch_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets"]
+						}
+					}
+				},
+				{
+					"name": "STEP 5: Add Provider to Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"provider_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/providers",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "providers"]
+						}
+					}
+				},
+				{
+					"name": "STEP 6: Add Problem to Ticket",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"problem_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/problems",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "problems"]
+						}
+					}
+				},
+				{
+					"name": "STEP 7: Add Solution to Ticket (Gera Custos!)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"solution_id\": 1,\n  \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1/solutions",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1", "solutions"]
+						}
+					}
+				},
+				{
+					"name": "STEP 8: Get Final Ticket (Com Custos)",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/tickets/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["tickets", "1"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
