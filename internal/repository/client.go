@@ -41,7 +41,7 @@ func (r *clientRepository) Create(ctx context.Context, client *domain.Client) (i
 }
 
 func (r *clientRepository) List(ctx context.Context) ([]domain.Client, error) {
-	query := `SELECT id, name FROM clients ORDER BY id`
+	query := `SELECT id, name FROM clients ORDER BY name ASC`
 
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {

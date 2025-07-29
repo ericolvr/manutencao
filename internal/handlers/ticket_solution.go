@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/ericolvr/maintenance-v2/internal/dto"
 	"github.com/ericolvr/maintenance-v2/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 type TicketSolutionHandler struct {
@@ -19,8 +19,6 @@ func NewTicketSolutionHandler(ticketService service.TicketService) *TicketSoluti
 	}
 }
 
-// AddSolutionToTicket associa uma solution do catálogo a um ticket
-// POST /api/v1/tickets/:id/solutions
 func (h *TicketSolutionHandler) AddSolutionToTicket(c *gin.Context) {
 	ticketIDStr := c.Param("id")
 	ticketID, err := strconv.Atoi(ticketIDStr)
@@ -44,8 +42,6 @@ func (h *TicketSolutionHandler) AddSolutionToTicket(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Solution added to ticket successfully"})
 }
 
-// GetTicketSolutions lista todas as solutions associadas a um ticket
-// GET /api/v1/tickets/:id/solutions
 func (h *TicketSolutionHandler) GetTicketSolutions(c *gin.Context) {
 	ticketIDStr := c.Param("id")
 	ticketID, err := strconv.Atoi(ticketIDStr)
@@ -63,8 +59,6 @@ func (h *TicketSolutionHandler) GetTicketSolutions(c *gin.Context) {
 	c.JSON(http.StatusOK, solutions)
 }
 
-// RemoveSolutionFromTicket remove a associação entre uma solution e um ticket
-// DELETE /api/v1/tickets/:id/solutions/:solution_id
 func (h *TicketSolutionHandler) RemoveSolutionFromTicket(c *gin.Context) {
 	ticketIDStr := c.Param("id")
 	ticketID, err := strconv.Atoi(ticketIDStr)

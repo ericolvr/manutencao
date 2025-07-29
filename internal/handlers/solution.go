@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/ericolvr/maintenance-v2/internal/dto"
 	"github.com/ericolvr/maintenance-v2/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 type SolutionHandler struct {
@@ -19,16 +19,6 @@ func NewSolutionHandler(solutionService service.SolutionService) *SolutionHandle
 	}
 }
 
-// @Summary Create a new solution
-// @Description Create a new solution in the system
-// @Tags solutions
-// @Accept json
-// @Produce json
-// @Param solution body dto.SolutionRequest true "Solution data"
-// @Success 201 {object} dto.SolutionResponse
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /api/v1/solutions [post]
 func (h *SolutionHandler) Create(c *gin.Context) {
 	var req dto.SolutionRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -47,17 +37,9 @@ func (h *SolutionHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
-// @Summary Get all solutions
-// @Description Get a list of all solutions
-// @Tags solutions
-// @Produce json
-// @Param problem_id query int false "Filter by problem ID"
-// @Success 200 {array} dto.SolutionResponse
-// @Failure 500 {object} map[string]string
-// @Router /api/v1/solutions [get]
 func (h *SolutionHandler) List(c *gin.Context) {
 	problemIDStr := c.Query("problem_id")
-	
+
 	if problemIDStr != "" {
 		problemID, err := strconv.Atoi(problemIDStr)
 		if err != nil {
@@ -86,16 +68,6 @@ func (h *SolutionHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// @Summary Get solution by ID
-// @Description Get a specific solution by its ID
-// @Tags solutions
-// @Produce json
-// @Param id path int true "Solution ID"
-// @Success 200 {object} dto.SolutionResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /api/v1/solutions/{id} [get]
 func (h *SolutionHandler) GetByID(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -114,18 +86,6 @@ func (h *SolutionHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// @Summary Update solution
-// @Description Update an existing solution
-// @Tags solutions
-// @Accept json
-// @Produce json
-// @Param id path int true "Solution ID"
-// @Param solution body dto.SolutionRequest true "Solution data"
-// @Success 200 {object} dto.SolutionResponse
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /api/v1/solutions/{id} [put]
 func (h *SolutionHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -151,15 +111,6 @@ func (h *SolutionHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// @Summary Delete solution
-// @Description Delete a solution by ID
-// @Tags solutions
-// @Param id path int true "Solution ID"
-// @Success 204
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /api/v1/solutions/{id} [delete]
 func (h *SolutionHandler) Delete(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

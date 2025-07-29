@@ -18,15 +18,18 @@ type TicketRepository interface {
 	AddProvider(ctx context.Context, ticketID int, providerID int) error
 	RemoveProvider(ctx context.Context, ticketID int) error
 	GetProviderOnTicket(ctx context.Context, ticketID int) (*domain.Provider, error)
+
 	// Ticket Costs methods
 	CreateTicketCosts(ctx context.Context, ticketID int, costs []domain.TicketCost) error
 	GetTicketCosts(ctx context.Context, ticketID int) ([]domain.TicketCost, error)
 	UpdateTicketCosts(ctx context.Context, ticketID int, costs []domain.TicketCost) error
 	DeleteTicketCosts(ctx context.Context, ticketID int) error
 	// Ticket Problems methods
+
 	AddProblemToTicket(ctx context.Context, ticketID int, problemID int) error
 	GetTicketProblems(ctx context.Context, ticketID int) ([]domain.TicketProblem, error)
 	RemoveProblemFromTicket(ctx context.Context, ticketID int, problemID int) error
+
 	// Ticket Solutions methods
 	AddSolutionToTicket(ctx context.Context, ticketID int, solutionID int, quantity int) error
 	GetTicketSolutions(ctx context.Context, ticketID int) ([]domain.TicketCost, error)

@@ -21,10 +21,12 @@ type TicketService interface {
 	AddProvider(ctx context.Context, ticketID int, req *dto.AddProviderRequest) error
 	RemoveProvider(ctx context.Context, ticketID int) error
 	GetProviderOnTicket(ctx context.Context, ticketID int) (*dto.ProviderSummaryResponse, error)
+
 	// Ticket Problem methods
 	AddProblemToTicket(ctx context.Context, ticketID int, req *dto.TicketProblemRequest) error
 	GetTicketProblems(ctx context.Context, ticketID int) ([]dto.TicketProblemResponse, error)
 	RemoveProblemFromTicket(ctx context.Context, ticketID int, problemID int) error
+
 	// Ticket Solution methods
 	AddSolutionToTicket(ctx context.Context, ticketID int, req *dto.TicketSolutionRequest) error
 	GetTicketSolutions(ctx context.Context, ticketID int) ([]dto.TicketSolutionResponse, error)

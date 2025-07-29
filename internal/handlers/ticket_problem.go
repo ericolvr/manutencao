@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/ericolvr/maintenance-v2/internal/dto"
 	"github.com/ericolvr/maintenance-v2/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 type TicketProblemHandler struct {
@@ -19,8 +19,6 @@ func NewTicketProblemHandler(ticketService service.TicketService) *TicketProblem
 	}
 }
 
-// AddProblemToTicket associa um problema a um ticket
-// POST /api/v1/tickets/:id/problems
 func (h *TicketProblemHandler) AddProblemToTicket(c *gin.Context) {
 	ticketIDStr := c.Param("id")
 	ticketID, err := strconv.Atoi(ticketIDStr)
@@ -44,8 +42,6 @@ func (h *TicketProblemHandler) AddProblemToTicket(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Problem added to ticket successfully"})
 }
 
-// GetTicketProblems lista todos os problemas associados a um ticket
-// GET /api/v1/tickets/:id/problems
 func (h *TicketProblemHandler) GetTicketProblems(c *gin.Context) {
 	ticketIDStr := c.Param("id")
 	ticketID, err := strconv.Atoi(ticketIDStr)
@@ -63,8 +59,6 @@ func (h *TicketProblemHandler) GetTicketProblems(c *gin.Context) {
 	c.JSON(http.StatusOK, problems)
 }
 
-// RemoveProblemFromTicket remove a associação entre um problema e um ticket
-// DELETE /api/v1/tickets/:id/problems/:problem_id
 func (h *TicketProblemHandler) RemoveProblemFromTicket(c *gin.Context) {
 	ticketIDStr := c.Param("id")
 	ticketID, err := strconv.Atoi(ticketIDStr)
