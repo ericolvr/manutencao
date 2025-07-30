@@ -92,7 +92,7 @@ func ToTicketResponseWithCosts(ticket *domain.Ticket, costs []domain.TicketCost)
 	for _, cost := range costs {
 		costItem := SolutionItemResponse{
 			ID:          cost.ID,
-			Description: "Custo do Ticket", // Pode ser melhorado buscando da tabela solutions
+			Description: cost.SolutionName,
 			UnitPrice:   cost.UnitPrice,
 			Quantity:    cost.Quantity,
 			Subtotal:    cost.Subtotal,

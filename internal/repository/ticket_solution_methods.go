@@ -11,18 +11,19 @@ import (
 func (r *ticketRepository) AddSolutionToTicket(ctx context.Context, ticketID int, solutionID int, quantity int) error {
 	// Buscar dados da solution para calcular custo
 	var unitPrice float64
-	err := r.db.QueryRowContext(ctx, "SELECT unit_price FROM solutions WHERE id = $1", solutionID).Scan(&unitPrice)
+	var solutionName string
+	err := r.db.QueryRowContext(ctx, "SELECT name, unit_price FROM solutions WHERE id = $1", solutionID).Scan(&solutionName, &unitPrice)
 	if err != nil {
-		return fmt.Errorf("failed to get solution price: %w", err)
+		return fmt.Errorf("failed to get solution data: %w", err)
 	}
 
 	subtotal := float64(quantity) * unitPrice
 
 	// Inserir na tabela ticket_costs
 	_, err = r.db.ExecContext(ctx, `
-		INSERT INTO ticket_costs (ticket_id, solution_id, quantity, unit_price, subtotal) 
-		VALUES ($1, $2, $3, $4, $5)
-	`, ticketID, solutionID, quantity, unitPrice, subtotal)
+		INSERT INTO ticket_costs (ticket_id, solution_id, solution_name, quantity, unit_price, subtotal) 
+		VALUES ($1, $2, $3, $4, $5, $6)
+	`, ticketID, solutionID, solutionName, quantity, unitPrice, subtotal)
 	if err != nil {
 		return fmt.Errorf("failed to add solution to ticket: %w", err)
 	}

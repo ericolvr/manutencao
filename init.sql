@@ -99,6 +99,7 @@ CREATE TABLE IF NOT EXISTS ticket_costs (
     id SERIAL PRIMARY KEY,
     ticket_id INTEGER NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
     solution_id INTEGER NOT NULL REFERENCES solutions(id),
+    solution_name VARCHAR(255) NOT NULL DEFAULT '',
     quantity INTEGER NOT NULL DEFAULT 1,
     unit_price DECIMAL(10,2) NOT NULL,  -- Preço no momento da aplicação
     subtotal DECIMAL(10,2) NOT NULL,    -- quantity * unit_price
@@ -137,10 +138,10 @@ INSERT INTO providers (name, mobile, zipcode, state, city, neighborhood, address
 ('MegaTech Soluções', '31965432109', '30140-071', 'MG', 'Belo Horizonte', 'Funcionários', 'Av. do Contorno, 6061', '12º andar');
 
 -- Dados de exemplo para usuários
-INSERT INTO users (name, email, password) VALUES
-('Administrador', 'admin@maintenance.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye'),
-('João Silva', 'joao@maintenance.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye'),
-('Maria Santos', 'maria@maintenance.com', '$2a$10$N9qo8uLOickgx2ZMRZoMye');
+INSERT INTO users (name, mobile, password, role, status) VALUES
+('Administrador', '11999000001', '$2a$10$N9qo8uLOickgx2ZMRZoMye', 1, true),
+('João Silva', '11999000002', '$2a$10$N9qo8uLOickgx2ZMRZoMye', 3, true),
+('Maria Santos', '11999000003', '$2a$10$N9qo8uLOickgx2ZMRZoMye', 5, true);
 
 -- Dados de exemplo para problemas (sem categorias)
 INSERT INTO problems (name, description) VALUES
@@ -193,15 +194,15 @@ INSERT INTO ticket_problems (ticket_id, problem_id) VALUES
 (3, 8); -- TK-2024-003 → Internet lenta
 
 -- Custos aplicados aos tickets
-INSERT INTO ticket_costs (ticket_id, solution_id, quantity, unit_price, subtotal) VALUES
+INSERT INTO ticket_costs (ticket_id, solution_id, solution_name, quantity, unit_price, subtotal) VALUES
 -- TK-2024-001: Ar condicionado não gela
-(1, 1, 2, 80.00, 160.00),   -- Limpeza de filtros x2
-(1, 2, 1, 150.00, 150.00),  -- Recarga de gás R22 x1
-(1, 4, 1, 140.00, 140.00),  -- Mão de obra especializada x1
+(1, 1, 'Limpeza de filtros', 2, 80.00, 160.00),   -- Limpeza de filtros x2
+(1, 2, 'Recarga de gás R22', 1, 150.00, 150.00),  -- Recarga de gás R22 x1
+(1, 4, 'Mão de obra especializada', 1, 140.00, 140.00),  -- Mão de obra especializada x1
 -- TK-2024-002: Lâmpadas queimadas
-(2, 9, 3, 25.00, 75.00),    -- Troca de lâmpada LED x3
+(2, 9, 'Troca de lâmpada LED', 3, 25.00, 75.00),    -- Troca de lâmpada LED x3
 -- TK-2024-003: Internet lenta
-(3, 13, 1, 120.00, 120.00); -- Configuração de rede x1
+(3, 13, 'Configuração de rede', 1, 120.00, 120.00); -- Configuração de rede x1
 
 
 

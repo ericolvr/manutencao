@@ -4,28 +4,29 @@ import "time"
 
 // Ticket representa um ticket de manutenção
 type Ticket struct {
-	ID          int       `json:"id" db:"id"`
-	Number      string    `json:"number" db:"number"`
-	Status      int       `json:"status" db:"status"`
-	Priority    string    `json:"priority" db:"priority"`
-	Description string    `json:"description" db:"description"`
-	OpenDate    time.Time `json:"open_date" db:"open_date"`
+	ID          int        `json:"id" db:"id"`
+	Number      string     `json:"number" db:"number"`
+	Status      int        `json:"status" db:"status"`
+	Priority    string     `json:"priority" db:"priority"`
+	Description string     `json:"description" db:"description"`
+	OpenDate    time.Time  `json:"open_date" db:"open_date"`
 	CloseDate   *time.Time `json:"close_date,omitempty" db:"close_date"`
-	BranchID    int       `json:"branch_id" db:"branch_id"`
-	ProviderID  *int      `json:"provider_id,omitempty" db:"provider_id"`
-	CreatedAt   time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+	BranchID    int        `json:"branch_id" db:"branch_id"`
+	ProviderID  *int       `json:"provider_id,omitempty" db:"provider_id"`
+	CreatedAt   time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at" db:"updated_at"`
 }
 
 // TicketCost representa os custos aplicados a um ticket
 type TicketCost struct {
-	ID         int       `json:"id" db:"id"`
-	TicketID   int       `json:"ticket_id" db:"ticket_id"`
-	SolutionID *int      `json:"solution_id,omitempty" db:"solution_id"`
-	Quantity   int       `json:"quantity" db:"quantity"`
-	UnitPrice  float64   `json:"unit_price" db:"unit_price"`
-	Subtotal   float64   `json:"subtotal" db:"subtotal"`
-	CreatedAt  time.Time `json:"created_at" db:"created_at"`
+	ID           int       `json:"id" db:"id"`
+	TicketID     int       `json:"ticket_id" db:"ticket_id"`
+	SolutionID   *int      `json:"solution_id,omitempty" db:"solution_id"`
+	SolutionName string    `json:"solution_name" db:"solution_name"`
+	Quantity     int       `json:"quantity" db:"quantity"`
+	UnitPrice    float64   `json:"unit_price" db:"unit_price"`
+	Subtotal     float64   `json:"subtotal" db:"subtotal"`
+	CreatedAt    time.Time `json:"created_at" db:"created_at"`
 }
 
 // TicketProblem representa a relação many-to-many entre Ticket e Problem

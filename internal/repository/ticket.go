@@ -346,9 +346,9 @@ func (r *ticketRepository) CreateTicketCosts(ctx context.Context, ticketID int, 
 
 	for _, cost := range costs {
 		_, err = tx.ExecContext(ctx,
-			`INSERT INTO ticket_costs (ticket_id, solution_id, quantity, unit_price, subtotal) 
-			 VALUES ($1, $2, $3, $4, $5)`,
-			ticketID, cost.SolutionID, cost.Quantity, cost.UnitPrice, cost.Subtotal)
+			`INSERT INTO ticket_costs (ticket_id, solution_id, solution_name, quantity, unit_price, subtotal) 
+			 VALUES ($1, $2, $3, $4, $5, $6)`,
+			ticketID, cost.SolutionID, cost.SolutionName, cost.Quantity, cost.UnitPrice, cost.Subtotal)
 		if err != nil {
 			return fmt.Errorf("failed to insert ticket cost: %w", err)
 		}
@@ -364,7 +364,7 @@ func (r *ticketRepository) CreateTicketCosts(ctx context.Context, ticketID int, 
 // GetTicketCosts retorna todos os custos de um ticket
 func (r *ticketRepository) GetTicketCosts(ctx context.Context, ticketID int) ([]domain.TicketCost, error) {
 	rows, err := r.db.QueryContext(ctx,
-		`SELECT id, ticket_id, solution_id, quantity, unit_price, subtotal, created_at 
+		`SELECT id, ticket_id, solution_id, solution_name, quantity, unit_price, subtotal, created_at 
 		 FROM ticket_costs WHERE ticket_id = $1 ORDER BY created_at`,
 		ticketID)
 	if err != nil {
@@ -379,6 +379,7 @@ func (r *ticketRepository) GetTicketCosts(ctx context.Context, ticketID int) ([]
 			&cost.ID,
 			&cost.TicketID,
 			&cost.SolutionID,
+			&cost.SolutionName,
 			&cost.Quantity,
 			&cost.UnitPrice,
 			&cost.Subtotal,
@@ -418,9 +419,9 @@ func (r *ticketRepository) UpdateTicketCosts(ctx context.Context, ticketID int, 
 	// Insere novos custos
 	for _, cost := range costs {
 		_, err = tx.ExecContext(ctx,
-			`INSERT INTO ticket_costs (ticket_id, solution_id, quantity, unit_price, subtotal) 
-			 VALUES ($1, $2, $3, $4, $5)`,
-			ticketID, cost.SolutionID, cost.Quantity, cost.UnitPrice, cost.Subtotal)
+			`INSERT INTO ticket_costs (ticket_id, solution_id, solution_name, quantity, unit_price, subtotal) 
+			 VALUES ($1, $2, $3, $4, $5, $6)`,
+			ticketID, cost.SolutionID, cost.SolutionName, cost.Quantity, cost.UnitPrice, cost.Subtotal)
 		if err != nil {
 			return fmt.Errorf("failed to insert ticket cost: %w", err)
 		}

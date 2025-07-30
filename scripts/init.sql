@@ -93,6 +93,7 @@ CREATE TABLE ticket_costs (
     id SERIAL PRIMARY KEY,
     ticket_id INTEGER REFERENCES tickets(id) ON DELETE CASCADE,
     solution_id INTEGER REFERENCES solutions(id) ON DELETE SET NULL,
+    solution_name VARCHAR(255) NOT NULL DEFAULT '',
     quantity INTEGER DEFAULT 1,
     unit_price DECIMAL(10,2) DEFAULT 0.00,
     subtotal DECIMAL(10,2) DEFAULT 0.00,
@@ -111,7 +112,7 @@ CREATE TABLE ticket_problems (
 -- Indexes for better performance
 CREATE INDEX idx_branchs_client ON branchs(client);
 CREATE INDEX idx_providers_name ON providers(name);
-CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_mobile ON users(mobile);
 CREATE INDEX idx_solutions_problem ON solutions(problem_id);
 CREATE INDEX idx_tickets_branch ON tickets(branch_id);
 CREATE INDEX idx_tickets_provider ON tickets(provider_id);
