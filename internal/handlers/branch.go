@@ -154,13 +154,19 @@ func (h *BranchHandler) GetByClient(c *gin.Context) {
 		return
 	}
 
-	response := make([]dto.BranchSummaryResponse, 0, len(branchs))
+	response := make([]dto.BranchResponse, 0, len(branchs))
 	for _, branch := range branchs {
-		response = append(response, dto.BranchSummaryResponse{
-			ID:      branch.ID,
-			Name:    branch.Name,
-			Uniorg:  branch.Uniorg,
-			Zipcode: branch.Zipcode,
+		response = append(response, dto.BranchResponse{
+			ID:           branch.ID,
+			Name:         branch.Name,
+			Client:       branch.Client,
+			Uniorg:       branch.Uniorg,
+			Zipcode:      branch.Zipcode,
+			State:        branch.State,
+			City:         branch.City,
+			Neighborhood: branch.Neighborhood,
+			Address:      branch.Address,
+			Complement:   branch.Complement,
 		})
 	}
 

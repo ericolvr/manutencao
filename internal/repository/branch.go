@@ -142,7 +142,7 @@ func (r *branchRepository) FindByUniorg(ctx context.Context, uniorg string) (*do
 }
 
 func (r *branchRepository) GetByClient(ctx context.Context, client string) ([]domain.Branch, error) {
-	query := `SELECT id, name, uniorg, zipcode FROM branchs WHERE client = $1 ORDER BY name ASC`
+	query := `SELECT id, name, uniorg, zipcode, state, city, neighborhood, address FROM branchs WHERE client = $1 ORDER BY name ASC`
 
 	rows, err := r.db.QueryContext(ctx, query, client)
 	if err != nil {
@@ -157,7 +157,11 @@ func (r *branchRepository) GetByClient(ctx context.Context, client string) ([]do
 			&branch.ID,
 			&branch.Name,
 			&branch.Uniorg,
-			&branch.Zipcode); err != nil {
+			&branch.Zipcode,
+			&branch.State,
+			&branch.City,
+			&branch.Neighborhood,
+			&branch.Address); err != nil {
 			return nil, fmt.Errorf("error scanning branch: %w", err)
 		}
 		branches = append(branches, branch)
