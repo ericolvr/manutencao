@@ -13,7 +13,7 @@ type BranchRequest struct {
 }
 
 type BranchResponse struct {
-	ID           string `json:"id"`
+	ID           int    `json:"id"`
 	Name         string `json:"name"`
 	Client       string `json:"client"`
 	Uniorg       string `json:"uniorg"`
@@ -26,7 +26,7 @@ type BranchResponse struct {
 }
 
 type BranchSummaryResponse struct {
-	ID      string `json:"id"`
+	ID      int    `json:"id"`
 	Name    string `json:"name"`
 	Uniorg  string `json:"uniorg"`
 	Zipcode string `json:"zipcode"`

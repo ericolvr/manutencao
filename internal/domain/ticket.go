@@ -21,6 +21,8 @@ type Ticket struct {
 type TicketCost struct {
 	ID           int       `json:"id" db:"id"`
 	TicketID     int       `json:"ticket_id" db:"ticket_id"`
+	ProblemID    *int      `json:"problem_id,omitempty" db:"problem_id"`
+	ProblemName  string    `json:"problem_name" db:"problem_name"`
 	SolutionID   *int      `json:"solution_id,omitempty" db:"solution_id"`
 	SolutionName string    `json:"solution_name" db:"solution_name"`
 	Quantity     int       `json:"quantity" db:"quantity"`

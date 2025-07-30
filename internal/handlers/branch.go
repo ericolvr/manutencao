@@ -47,7 +47,7 @@ func (h *BranchHandler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dto.BranchResponse{
-		ID:           strconv.Itoa(id),
+		ID:           id,
 		Name:         req.Name,
 		Client:       req.Client,
 		Uniorg:       req.Uniorg,
@@ -70,7 +70,7 @@ func (h *BranchHandler) List(c *gin.Context) {
 	response := make([]dto.BranchResponse, 0, len(branchs))
 	for _, branch := range branchs {
 		response = append(response, dto.BranchResponse{
-			ID:           strconv.Itoa(branch.ID),
+			ID:           branch.ID,
 			Name:         branch.Name,
 			Client:       branch.Client,
 			Uniorg:       branch.Uniorg,
@@ -105,7 +105,7 @@ func (h *BranchHandler) FindByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.BranchResponse{
-		ID:           strconv.Itoa(branch.ID),
+		ID:           branch.ID,
 		Name:         branch.Name,
 		Client:       branch.Client,
 		Uniorg:       branch.Uniorg,
@@ -132,7 +132,7 @@ func (h *BranchHandler) FindByUniorg(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.BranchResponse{
-		ID:           strconv.Itoa(branch.ID),
+		ID:           branch.ID,
 		Name:         branch.Name,
 		Client:       branch.Client,
 		Uniorg:       branch.Uniorg,
@@ -157,7 +157,7 @@ func (h *BranchHandler) GetByClient(c *gin.Context) {
 	response := make([]dto.BranchSummaryResponse, 0, len(branchs))
 	for _, branch := range branchs {
 		response = append(response, dto.BranchSummaryResponse{
-			ID:      strconv.Itoa(branch.ID),
+			ID:      branch.ID,
 			Name:    branch.Name,
 			Uniorg:  branch.Uniorg,
 			Zipcode: branch.Zipcode,
@@ -205,7 +205,7 @@ func (h *BranchHandler) Update(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.BranchResponse{
-		ID:           strconv.Itoa(id),
+		ID:           id,
 		Name:         branch.Name,
 		Client:       branch.Client,
 		Uniorg:       branch.Uniorg,

@@ -39,7 +39,7 @@ func (h *ClientHandler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dto.ClientResponse{
-		ID:   strconv.Itoa(id),
+		ID:   id,
 		Name: client.Name,
 	})
 }
@@ -54,7 +54,7 @@ func (h *ClientHandler) List(c *gin.Context) {
 	response := make([]dto.ClientResponse, 0, len(clients))
 	for _, client := range clients {
 		response = append(response, dto.ClientResponse{
-			ID:   strconv.Itoa(client.ID),
+			ID:   client.ID,
 			Name: client.Name,
 		})
 	}
@@ -81,7 +81,7 @@ func (h *ClientHandler) FindByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.ClientResponse{
-		ID:   strconv.Itoa(client.ID),
+		ID:   client.ID,
 		Name: client.Name,
 	})
 }
@@ -116,7 +116,7 @@ func (h *ClientHandler) Update(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dto.ClientResponse{
-		ID:   strconv.Itoa(id),
+		ID:   id,
 		Name: client.Name,
 	})
 }

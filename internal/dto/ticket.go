@@ -51,6 +51,7 @@ type SolutionItemRequest struct {
 // SolutionItemResponse representa um item de solução na resposta
 type SolutionItemResponse struct {
 	ID          int     `json:"id"`
+	ProblemName string  `json:"problem_name"`
 	Description string  `json:"description"`
 	UnitPrice   float64 `json:"unit_price"`
 	Quantity    int     `json:"quantity"`
@@ -92,6 +93,7 @@ func ToTicketResponseWithCosts(ticket *domain.Ticket, costs []domain.TicketCost)
 	for _, cost := range costs {
 		costItem := SolutionItemResponse{
 			ID:          cost.ID,
+			ProblemName: cost.ProblemName,
 			Description: cost.SolutionName,
 			UnitPrice:   cost.UnitPrice,
 			Quantity:    cost.Quantity,
