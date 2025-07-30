@@ -1,14 +1,6 @@
 -- Database: maintenance_v2
 -- Complete schema with all entities
 
--- Clients table (deve ser criada primeiro pois branchs referencia ela)
-CREATE TABLE clients (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Branchs table  
 CREATE TABLE branchs (
     id SERIAL PRIMARY KEY,
@@ -24,6 +16,41 @@ CREATE TABLE branchs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Insert Branchs
+INSERT INTO branchs (client, name, uniorg, zipcode, state, city, neighborhood, address, complement) VALUES 
+('Basa', 'Icoaraci', '001-0001', '68810-100', 'PA', 'Belém', 'Centro', 'Rua Manoel Barata, 660', ''),
+('Basa', 'Imperatriz', '002-0002', '65900-120', 'MA', 'Imperatriz', 'Beira io', 'Av. getúlio Vargas, 404', ''),
+('Correios', 'Vanderlei', '003-0009', '05011-001', 'SP', 'São Paulo', 'Pompéia', 'Rua Vanderlei, 832', '');
+
+
+-- Clients table
+CREATE TABLE clients (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert Clients
+INSERT INTO clients (name) VALUES
+('Basa'),
+('Banco do Nordeste'),
+('Correios'),
+('Santander');
+
+
+-- Costs table  
+CREATE TABLE costs (
+    id SERIAL PRIMARY KEY,
+    value_per_km DECIMAL(10,2) NOT NULL,
+    initial_value DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+-- Insert Costs
+INSERT INTO costs (value_per_km, initial_value) VALUES
+(1.00, 100.00);
 
 
 -- Providers table
@@ -41,7 +68,14 @@ CREATE TABLE providers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de usuários
+-- Insert Providers
+INSERT INTO providers (name, mobile, zipcode, state, city, neighborhood, address, complement) VALUES
+('Julio Mesquita', '11987654321', '04531-080', 'SP', 'São Paulo', 'Itaim Bibi', 'Rua Prof. Carlos de Carvalho, 74', ''),
+('Manoel Santos', '11987654321', '02553-050', 'SP', 'São Paulo', 'Casa Verde', 'Rua António João 600', ''),
+('Mario Lago', '31965432109', '05011-001', 'SP', 'São Paulo', 'Pompéia', 'Rua Vanderlei, 832', '');
+
+
+-- Users table
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -53,7 +87,14 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de tickets SIMPLIFICADA (sem categoria direta, usa associação com problemas)
+-- Insert Users
+INSERT INTO users (name, mobile, password, role, status) VALUES
+('Administrador', '11999000001', '$2a$10$N9qo8uLOickgx2ZMRZoMye', 1, true),
+('João Silva', '11999000002', '$2a$10$N9qo8uLOickgx2ZMRZoMye', 3, true),
+('Maria Santos', '11999000003', '$2a$10$N9qo8uLOickgx2ZMRZoMye', 5, true);
+
+
+-- Ticket table
 CREATE TABLE IF NOT EXISTS tickets (
     id SERIAL PRIMARY KEY,
     number VARCHAR(50) NOT NULL UNIQUE,
@@ -68,7 +109,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de problemas específicos
+-- Problem table
 CREATE TABLE IF NOT EXISTS problems (
     id SERIAL PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
@@ -76,8 +117,14 @@ CREATE TABLE IF NOT EXISTS problems (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- Insert Problems
+INSERT INTO problems (name, description) VALUES
+('Câmera não exibe imagem', 'Câmera não exibe imagem'),
+('Falha de Bateria', 'Gerador com Falha de Bateria'),
+('Sirene', 'Problemas na sirene');
 
--- Tabela de catálogo de soluções (referencia problemas específicos)
+
+-- Solution table
 CREATE TABLE IF NOT EXISTS solutions (
     id SERIAL PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
@@ -87,8 +134,17 @@ CREATE TABLE IF NOT EXISTS solutions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+-- Insert Solutions
+INSERT INTO solutions (name, description, unit_price, problem_id) VALUES
+('Configuração de Câmera', 'Configuração de Câmera', 80.00, 1),
+('Troca de Câmera', 'Troca de Câmera', 2100.00, 1),
+('Configuração de DVR', 'Configuração de DVR', 350.00, 1),
+('Verificação de Bateria', 'Verificação de Bateria', 100.00, 2),
+('Troca de Bateria', 'Troca de Bateria', 3890.00, 2),
+('Configuração de Sirene', 'Configuração de Sirene', 120.00, 3),
+('Troca de Sirene', 'Troca de Sirene', 876.00, 3);
 
--- Tabela de associação many-to-many entre tickets e problemas
+-- TicketProblem table
 CREATE TABLE IF NOT EXISTS ticket_problems (
     id SERIAL PRIMARY KEY,
     ticket_id INTEGER NOT NULL,
@@ -97,7 +153,7 @@ CREATE TABLE IF NOT EXISTS ticket_problems (
     UNIQUE(ticket_id, problem_id)
 );
 
--- Tabela de custos dos tickets (histórico de problemas e soluções aplicadas)
+-- TicketCost table
 CREATE TABLE IF NOT EXISTS ticket_costs (
     id SERIAL PRIMARY KEY,
     ticket_id INTEGER NOT NULL,
@@ -111,7 +167,7 @@ CREATE TABLE IF NOT EXISTS ticket_costs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Índices para performance
+-- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
 CREATE INDEX IF NOT EXISTS idx_tickets_branch_id ON tickets(branch_id);
 CREATE INDEX IF NOT EXISTS idx_tickets_provider_id ON tickets(provider_id);
@@ -123,89 +179,3 @@ CREATE INDEX IF NOT EXISTS idx_ticket_problems_problem_id ON ticket_problems(pro
 CREATE INDEX IF NOT EXISTS idx_ticket_costs_ticket_id ON ticket_costs(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_ticket_costs_problem_id ON ticket_costs(problem_id);
 CREATE INDEX IF NOT EXISTS idx_ticket_costs_solution_id ON ticket_costs(solution_id);
-
--- Dados de exemplo para clientes
-INSERT INTO clients (name) VALUES
-('Empresa ABC Ltda'),
-('Comércio XYZ S/A'),
-('Indústria DEF ME');
-
--- Dados de exemplo para filiais
-INSERT INTO branchs (client, name, uniorg, zipcode, state, city, neighborhood, address, complement) VALUES
-('Empresa ABC Ltda', 'Filial São Paulo Centro', 'SP001', '01310-100', 'SP', 'São Paulo', 'Bela Vista', 'Av. Paulista, 1000', 'Conjunto 101'),
-('Empresa ABC Ltda', 'Filial São Paulo Norte', 'SP002', '02071-000', 'SP', 'São Paulo', 'Santana', 'Av. Cruzeiro do Sul, 1100', 'Bloco A'),
-('Comércio XYZ S/A', 'Filial Rio Centro', 'RJ001', '20040-020', 'RJ', 'Rio de Janeiro', 'Centro', 'Rua da Carioca, 50', '2º andar'),
-('Indústria DEF ME', 'Filial BH Principal', 'MG001', '30112-000', 'MG', 'Belo Horizonte', 'Centro', 'Rua dos Carijós, 200', 'Sala 301');
-
--- Dados de exemplo para prestadores
-INSERT INTO providers (name, mobile, zipcode, state, city, neighborhood, address, complement) VALUES
-('TechService Manutenção', '11987654321', '04567-890', 'SP', 'São Paulo', 'Vila Olímpia', 'Rua Funchal, 500', 'Conjunto 1001'),
-('RapidFix Assistência', '21976543210', '22071-900', 'RJ', 'Rio de Janeiro', 'Copacabana', 'Av. Atlântica, 1702', 'Cobertura'),
-('MegaTech Soluções', '31965432109', '30140-071', 'MG', 'Belo Horizonte', 'Funcionários', 'Av. do Contorno, 6061', '12º andar');
-
--- Dados de exemplo para usuários
-INSERT INTO users (name, mobile, password, role, status) VALUES
-('Administrador', '11999000001', '$2a$10$N9qo8uLOickgx2ZMRZoMye', 1, true),
-('João Silva', '11999000002', '$2a$10$N9qo8uLOickgx2ZMRZoMye', 3, true),
-('Maria Santos', '11999000003', '$2a$10$N9qo8uLOickgx2ZMRZoMye', 5, true);
-
--- Dados de exemplo para problemas (sem categorias)
-INSERT INTO problems (name, description) VALUES
-('Ar condicionado não gela', 'Sistema de refrigeração não está funcionando adequadamente'),
-('Ar condicionado faz barulho excessivo', 'Ruídos anômalos durante funcionamento'),
-('Ar condicionado vaza água', 'Vazamento de água do equipamento'),
-('Ar condicionado não liga', 'Equipamento não responde ao comando'),
-('Lâmpada queimada', 'Iluminação não funciona por lâmpada defeituosa'),
-('Tomada sem energia', 'Ponto de energia não fornece eletricidade'),
-('Disjuntor desarma frequentemente', 'Proteção elétrica atua constantemente'),
-('Internet lenta', 'Conexão com velocidade abaixo do esperado'),
-('Computador não liga', 'Equipamento não inicializa'),
-('Impressora não funciona', 'Equipamento de impressão com defeito'),
-('Torneira pingando', 'Vazamento constante na torneira'),
-('Vaso sanitário entupido', 'Obstrução no sistema de esgoto');
-
--- Dados de exemplo para soluções do catálogo
-INSERT INTO solutions (name, description, unit_price, problem_id) VALUES
--- Soluções para Ar Condicionado
-('Limpeza de filtros', 'Limpeza e higienização dos filtros do ar condicionado', 80.00, 1),
-('Recarga de gás R22', 'Recarga do gás refrigerante R22', 150.00, 1),
-('Recarga de gás R410A', 'Recarga do gás refrigerante R410A', 180.00, 1),
-('Mão de obra especializada', 'Serviço técnico especializado em climatização', 140.00, 1),
-('Lubrificação de componentes', 'Lubrificação de partes móveis do equipamento', 60.00, 2),
-('Limpeza do dreno', 'Desobstrução e limpeza do sistema de drenagem', 90.00, 3),
-('Verificação elétrica', 'Diagnóstico e reparo de componentes elétricos', 120.00, 4),
--- Soluções para Elétrica
-('Troca de lâmpada LED', 'Substituição por lâmpada LED equivalente', 25.00, 5),
-('Troca de lâmpada fluorescente', 'Substituição por lâmpada fluorescente', 15.00, 5),
-('Verificação de fiação', 'Inspeção e reparo da instalação elétrica', 100.00, 6),
-('Troca de disjuntor', 'Substituição de disjuntor defeituoso', 80.00, 7),
--- Soluções para Rede/TI
-('Configuração de rede', 'Otimização e configuração da rede', 120.00, 8),
-('Diagnóstico de hardware', 'Verificação de componentes do computador', 100.00, 9),
-('Manutenção de impressora', 'Limpeza e calibração da impressora', 80.00, 10),
--- Soluções para Hidráulica
-('Troca de reparo da torneira', 'Substituição de componentes internos', 45.00, 11),
-('Desentupimento', 'Desobstrução do sistema de esgoto', 120.00, 12);
-
--- Dados de exemplo para tickets
-INSERT INTO tickets (number, status, priority, description, open_date, branch_id, provider_id) VALUES
-('TK-2024-001', 1, 'Alta', 'Ar condicionado da sala de reuniões não está gelando adequadamente', '2024-01-15 09:00:00', 1, 1),
-('TK-2024-002', 2, 'Média', 'Lâmpadas do corredor principal queimadas', '2024-01-16 14:30:00', 2, 2),
-('TK-2024-003', 1, 'Baixa', 'Internet lenta no setor administrativo', '2024-01-17 11:15:00', 3, 3);
-
--- Associações de problemas aos tickets
-INSERT INTO ticket_problems (ticket_id, problem_id) VALUES
-(1, 1), -- TK-2024-001 → Ar condicionado não gela
-(2, 5), -- TK-2024-002 → Lâmpada queimada
-(3, 8); -- TK-2024-003 → Internet lenta
-
--- Custos aplicados aos tickets
-INSERT INTO ticket_costs (ticket_id, problem_id, problem_name, solution_id, solution_name, quantity, unit_price, subtotal) VALUES
--- TK-2024-001: Ar condicionado não gela
-(1, 1, 'Ar condicionado não gela', 1, 'Limpeza de filtros', 2, 80.00, 160.00),   -- Limpeza de filtros x2
-(1, 1, 'Ar condicionado não gela', 2, 'Recarga de gás R22', 1, 150.00, 150.00),  -- Recarga de gás R22 x1
-(1, 1, 'Ar condicionado não gela', 4, 'Mão de obra especializada', 1, 140.00, 140.00),  -- Mão de obra especializada x1
--- TK-2024-002: Lâmpadas queimadas
-(2, 5, 'Lâmpada queimada', 9, 'Troca de lâmpada LED', 3, 25.00, 75.00),    -- Troca de lâmpada LED x3
--- TK-2024-003: Internet lenta
-(3, 8, 'Internet lenta', 13, 'Configuração de rede', 1, 120.00, 120.00); -- Configuração de rede x1
