@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strconv"
 
 	"github.com/ericolvr/maintenance-v2/internal/domain"
 )
@@ -224,12 +225,24 @@ func (r *ticketRepository) Delete(ctx context.Context, ticketID int) error {
 }
 
 func (r *ticketRepository) GetTicketNumber(ctx context.Context) (int, error) {
-	var count int
-	err := r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM tickets").Scan(&count)
+	var maxNumber sql.NullString
+	err := r.db.QueryRowContext(ctx, "SELECT MAX(number) FROM tickets").Scan(&maxNumber)
 	if err != nil {
-		return 0, fmt.Errorf("failed to get ticket count: %w", err)
+		return 0, fmt.Errorf("failed to get max ticket number: %w", err)
 	}
-	return count + 1, nil
+
+	// Se não há tickets ainda, começar com 1
+	if !maxNumber.Valid || maxNumber.String == "" {
+		return 1, nil
+	}
+
+	// Converter string para int
+	maxInt, err := strconv.Atoi(maxNumber.String)
+	if err != nil {
+		return 0, fmt.Errorf("failed to convert max number to int: %w", err)
+	}
+
+	return maxInt + 1, nil
 }
 
 func (r *ticketRepository) AddProvider(ctx context.Context, ticketID int, providerID int) error {
