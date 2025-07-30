@@ -20,6 +20,7 @@ func main() {
 	// Repositories
 	branchRepo := repository.NewBranchRepository(db)
 	clientRepo := repository.NewClientRepository(db)
+	costRepo := repository.NewCostRepository(db)
 	providerRepo := repository.NewProviderRepository(db)
 	ticketRepo := repository.NewTicketRepository(db)
 	userRepo := repository.NewUserRepository(db)
@@ -29,6 +30,7 @@ func main() {
 	// Services
 	branchService := service.NewBranchService(branchRepo)
 	clientService := service.NewClientService(clientRepo)
+	costService := service.NewCostService(costRepo)
 	providerService := service.NewProviderService(providerRepo)
 	ticketService := service.NewTicketService(ticketRepo, branchRepo, providerRepo, problemRepo, solutionRepo)
 	userService := service.NewUserService(userRepo, []byte(cfg.JWTSecret))
@@ -49,6 +51,7 @@ func main() {
 	// Routes
 	routes.BranchRoutes(router, handlers.NewBranchHandler(branchService))
 	routes.ClientRoutes(router, handlers.NewClientHandler(clientService))
+	routes.CostRoutes(router, handlers.NewCostHandler(costService))
 	routes.ProviderRoutes(router, handlers.NewProviderHandler(providerService))
 	routes.TicketRoutes(router, handlers.NewTicketHandler(ticketService), handlers.NewTicketProblemHandler(ticketService), handlers.NewTicketSolutionHandler(ticketService))
 	routes.UserRoutes(router, handlers.NewUserHandler(userService))
