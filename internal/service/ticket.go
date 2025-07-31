@@ -34,11 +34,12 @@ type TicketService interface {
 }
 
 type ticketService struct {
-	ticketRepo   repository.TicketRepository
-	branchRepo   repository.BranchRepository
-	providerRepo repository.ProviderRepository
-	problemRepo  repository.ProblemRepository
-	solutionRepo repository.SolutionRepository
+	ticketRepo     repository.TicketRepository
+	branchRepo     repository.BranchRepository
+	providerRepo   repository.ProviderRepository
+	problemRepo    repository.ProblemRepository
+	solutionRepo   repository.SolutionRepository
+	distanceService DistanceService
 }
 
 func NewTicketService(
@@ -47,13 +48,15 @@ func NewTicketService(
 	providerRepo repository.ProviderRepository,
 	problemRepo repository.ProblemRepository,
 	solutionRepo repository.SolutionRepository,
+	distanceService DistanceService,
 ) TicketService {
 	return &ticketService{
-		ticketRepo:   ticketRepo,
-		branchRepo:   branchRepo,
-		providerRepo: providerRepo,
-		problemRepo:  problemRepo,
-		solutionRepo: solutionRepo,
+		ticketRepo:     ticketRepo,
+		branchRepo:     branchRepo,
+		providerRepo:   providerRepo,
+		problemRepo:    problemRepo,
+		solutionRepo:   solutionRepo,
+		distanceService: distanceService,
 	}
 }
 
@@ -128,7 +131,14 @@ func (s *ticketService) FindByID(ctx context.Context, id int) (*dto.TicketRespon
 		return nil, fmt.Errorf("failed to get ticket costs: %w", err)
 	}
 
-	return dto.ToTicketResponseWithCosts(ticket, costs), nil
+	// Buscar distance do ticket pelo número
+	var distanceValue *float64
+	distance, err := s.distanceService.FindByNumber(ctx, ticket.Number)
+	if err == nil && distance != nil {
+		distanceValue = &distance.Distance
+	}
+
+	return dto.ToTicketResponseWithDistanceAndCosts(ticket, distanceValue, costs), nil
 }
 
 func (s *ticketService) Update(ctx context.Context, id int, req *dto.UpdateTicketRequest) (*dto.TicketResponse, error) {

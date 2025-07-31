@@ -34,7 +34,7 @@ func main() {
 	costService := service.NewCostService(costRepo)
 	distanceService := service.NewDistanceService(distanceRepo)
 	providerService := service.NewProviderService(providerRepo)
-	ticketService := service.NewTicketService(ticketRepo, branchRepo, providerRepo, problemRepo, solutionRepo)
+	ticketService := service.NewTicketService(ticketRepo, branchRepo, providerRepo, problemRepo, solutionRepo, distanceService)
 	userService := service.NewUserService(userRepo, []byte(cfg.JWTSecret))
 	problemService := service.NewProblemService(problemRepo)
 	solutionService := service.NewSolutionService(solutionRepo, problemRepo)
