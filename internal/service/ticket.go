@@ -125,6 +125,21 @@ func (s *ticketService) FindByID(ctx context.Context, id int) (*dto.TicketRespon
 		return nil, fmt.Errorf("failed to find ticket: %w", err)
 	}
 
+	// Buscar informações do branch
+	branch, err := s.branchRepo.FindByID(ctx, ticket.BranchID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find branch: %w", err)
+	}
+
+	// Buscar informações do provider (se existir)
+	var provider *domain.Provider
+	if ticket.ProviderID != nil {
+		provider, err = s.providerRepo.FindByID(ctx, *ticket.ProviderID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to find provider: %w", err)
+		}
+	}
+
 	// Buscar custos do ticket
 	costs, err := s.ticketRepo.GetTicketCosts(ctx, id)
 	if err != nil {
@@ -138,7 +153,7 @@ func (s *ticketService) FindByID(ctx context.Context, id int) (*dto.TicketRespon
 		distanceValue = &distance.Distance
 	}
 
-	return dto.ToTicketResponseWithDistanceAndCosts(ticket, distanceValue, costs), nil
+	return dto.ToTicketResponseWithBranchProviderDistanceAndCosts(ticket, branch, provider, distanceValue, costs), nil
 }
 
 func (s *ticketService) Update(ctx context.Context, id int, req *dto.UpdateTicketRequest) (*dto.TicketResponse, error) {

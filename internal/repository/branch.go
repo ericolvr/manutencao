@@ -95,8 +95,8 @@ func (r *branchRepository) FindByID(ctx context.Context, id int) (*domain.Branch
 
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&branch.ID,
-		&branch.Client,
-		&branch.Name,
+		&branch.Name,    // Corrigido: name vem antes de client na query
+		&branch.Client,  // Corrigido: client vem depois de name na query
 		&branch.Uniorg,
 		&branch.Zipcode,
 		&branch.State,

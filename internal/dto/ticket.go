@@ -28,18 +28,21 @@ type UpdateTicketRequest struct {
 }
 
 type TicketResponse struct {
-	ID          int                    `json:"id"`
-	Number      string                 `json:"number"`
-	Status      int                    `json:"status"`
-	Priority    string                 `json:"priority"`
-	Description string                 `json:"description"`
-	OpenDate    time.Time              `json:"open_date"`
-	CloseDate   *time.Time             `json:"close_date,omitempty"`
-	BranchID    int                    `json:"branch_id"`
-	ProviderID  *int                   `json:"provider_id,omitempty"`
-	Distance    *float64               `json:"distance,omitempty"`
-	Costs       []SolutionItemResponse `json:"costs,omitempty"`
-	TotalCost   float64                `json:"total_cost"`
+	ID           int                    `json:"id"`
+	Number       string                 `json:"number"`
+	Status       int                    `json:"status"`
+	Priority     string                 `json:"priority"`
+	Description  string                 `json:"description"`
+	OpenDate     time.Time              `json:"open_date"`
+	CloseDate    *time.Time             `json:"close_date,omitempty"`
+	BranchID     int                    `json:"branch_id"`
+	BranchName   string                 `json:"branch_name"`
+	BranchUniorg string                 `json:"branch_uniorg"`
+	ProviderID   *int                   `json:"provider_id,omitempty"`
+	ProviderName *string                `json:"provider_name,omitempty"`
+	Distance     *float64               `json:"distance,omitempty"`
+	Costs        []SolutionItemResponse `json:"costs,omitempty"`
+	TotalCost    float64                `json:"total_cost"`
 }
 
 // SolutionItemRequest representa um item de solução na requisição
@@ -51,10 +54,10 @@ type SolutionItemRequest struct {
 
 // SolutionItemResponse representa um item de solução na resposta
 type SolutionItemResponse struct {
-	ProblemName string  `json:"problem_name"`
-	Description string  `json:"description"`
-	UnitPrice   float64 `json:"unit_price"`
-	Subtotal    float64 `json:"subtotal"`
+	ProblemName  string  `json:"problem_name"`
+	SolutionName string  `json:"solution_name"`
+	UnitPrice    float64 `json:"unit_price"`
+	Subtotal     float64 `json:"subtotal"`
 }
 
 // MapToTicketResponse mapeia um domínio Ticket para sua representação DTO TicketResponse
@@ -90,10 +93,10 @@ func ToTicketResponseWithCosts(ticket *domain.Ticket, costs []domain.TicketCost)
 
 	for _, cost := range costs {
 		costItem := SolutionItemResponse{
-			ProblemName: cost.ProblemName,
-			Description: cost.SolutionName,
-			UnitPrice:   cost.UnitPrice,
-			Subtotal:    cost.Subtotal,
+			ProblemName:  cost.ProblemName,
+			SolutionName: cost.SolutionName,
+			UnitPrice:    cost.UnitPrice,
+			Subtotal:     cost.Subtotal,
 		}
 		costItems = append(costItems, costItem)
 		totalCost += cost.Subtotal
@@ -126,28 +129,31 @@ func ToTicketResponseWithDistanceAndCosts(ticket *domain.Ticket, distance *float
 
 	for _, cost := range costs {
 		costItem := SolutionItemResponse{
-			ProblemName: cost.ProblemName,
-			Description: cost.SolutionName,
-			UnitPrice:   cost.UnitPrice,
-			Subtotal:    cost.Subtotal,
+			ProblemName:  cost.ProblemName,
+			SolutionName: cost.SolutionName,
+			UnitPrice:    cost.UnitPrice,
+			Subtotal:     cost.Subtotal,
 		}
 		costItems = append(costItems, costItem)
 		totalCost += cost.Subtotal
 	}
 
 	return &TicketResponse{
-		ID:          ticket.ID,
-		Number:      ticket.Number,
-		Status:      ticket.Status,
-		Priority:    ticket.Priority,
-		Description: ticket.Description,
-		OpenDate:    ticket.OpenDate,
-		CloseDate:   ticket.CloseDate,
-		BranchID:    ticket.BranchID,
-		ProviderID:  ticket.ProviderID,
-		Distance:    distance,
-		Costs:       costItems,
-		TotalCost:   totalCost,
+		ID:           ticket.ID,
+		Number:       ticket.Number,
+		Status:       ticket.Status,
+		Priority:     ticket.Priority,
+		Description:  ticket.Description,
+		OpenDate:     ticket.OpenDate,
+		CloseDate:    ticket.CloseDate,
+		BranchID:     ticket.BranchID,
+		BranchName:   "", // Será preenchido pela nova função
+		BranchUniorg: "", // Será preenchido pela nova função
+		ProviderID:   ticket.ProviderID,
+		ProviderName: nil, // Será preenchido pela nova função
+		Distance:     distance,
+		Costs:        costItems,
+		TotalCost:    totalCost,
 	}
 }
 
@@ -168,4 +174,57 @@ type UpdateSolutionItemRequest struct {
 	Description string  `json:"description" binding:"required"`
 	UnitPrice   float64 `json:"unit_price" binding:"required"`
 	Quantity    int     `json:"quantity" binding:"required"`
+}
+
+// ToTicketResponseWithBranchProviderDistanceAndCosts mapeia um domínio Ticket com branch, provider, distance e custos para TicketResponse
+func ToTicketResponseWithBranchProviderDistanceAndCosts(ticket *domain.Ticket, branch *domain.Branch, provider *domain.Provider, distance *float64, costs []domain.TicketCost) *TicketResponse {
+	if ticket == nil {
+		return nil
+	}
+
+	var costItems []SolutionItemResponse
+	var totalCost float64
+
+	for _, cost := range costs {
+		costItem := SolutionItemResponse{
+			ProblemName:  cost.ProblemName,
+			SolutionName: cost.SolutionName,
+			UnitPrice:    cost.UnitPrice,
+			Subtotal:     cost.Subtotal,
+		}
+		costItems = append(costItems, costItem)
+		totalCost += cost.Subtotal
+	}
+
+	// Preparar nome do provider (se existir)
+	var providerName *string
+	if provider != nil {
+		providerName = &provider.Name
+	}
+
+	// Preparar informações do branch
+	branchName := ""
+	branchUniorg := ""
+	if branch != nil {
+		branchName = branch.Name
+		branchUniorg = branch.Uniorg
+	}
+
+	return &TicketResponse{
+		ID:           ticket.ID,
+		Number:       ticket.Number,
+		Status:       ticket.Status,
+		Priority:     ticket.Priority,
+		Description:  ticket.Description,
+		OpenDate:     ticket.OpenDate,
+		CloseDate:    ticket.CloseDate,
+		BranchID:     ticket.BranchID,
+		BranchName:   branchName,
+		BranchUniorg: branchUniorg,
+		ProviderID:   ticket.ProviderID,
+		ProviderName: providerName,
+		Distance:     distance,
+		Costs:        costItems,
+		TotalCost:    totalCost,
+	}
 }
