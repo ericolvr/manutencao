@@ -53,6 +53,18 @@ INSERT INTO costs (value_per_km, initial_value) VALUES
 (1.00, 100.00);
 
 
+-- Distances table
+CREATE TABLE IF NOT EXISTS distances (
+    id SERIAL PRIMARY KEY,
+    distance DECIMAL(10,2) NOT NULL,
+    ticket_number VARCHAR(50) NOT NULL,
+    provider_id INTEGER NOT NULL,
+    provider_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 -- Providers table
 CREATE TABLE providers (
     id SERIAL PRIMARY KEY,
@@ -179,3 +191,5 @@ CREATE INDEX IF NOT EXISTS idx_ticket_problems_problem_id ON ticket_problems(pro
 CREATE INDEX IF NOT EXISTS idx_ticket_costs_ticket_id ON ticket_costs(ticket_id);
 CREATE INDEX IF NOT EXISTS idx_ticket_costs_problem_id ON ticket_costs(problem_id);
 CREATE INDEX IF NOT EXISTS idx_ticket_costs_solution_id ON ticket_costs(solution_id);
+CREATE INDEX IF NOT EXISTS idx_distances_ticket_number ON distances(ticket_number);
+CREATE INDEX IF NOT EXISTS idx_distances_provider_id ON distances(provider_id);
