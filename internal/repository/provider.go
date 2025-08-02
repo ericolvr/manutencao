@@ -53,7 +53,7 @@ func (r *providerRepository) Create(ctx context.Context, provider *domain.Provid
 }
 
 func (r *providerRepository) List(ctx context.Context) ([]domain.Provider, error) {
-	query := `SELECT id, name, mobile, zipcode, state, city, neighborhood, address, complement FROM providers ORDER BY name ASC`
+	query := `SELECT id, name, mobile, zipcode, state, city, neighborhood, address, complement FROM providers ORDER BY name DESC`
 
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
