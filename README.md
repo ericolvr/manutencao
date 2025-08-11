@@ -1,4 +1,4 @@
-# Sistema de Gestão de Tickets de Manutenção v2
+# Sistema de Gestão de Tickets de Manutenção
 
 Sistema backend em Golang para gerenciamento de tickets de manutenção, desenvolvido com arquitetura limpa e suporte a múltiplos ambientes.
 
