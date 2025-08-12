@@ -179,6 +179,16 @@ CREATE TABLE IF NOT EXISTS ticket_costs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- SLA table
+CREATE TABLE IF NOT EXISTS sla (
+    id SERIAL PRIMARY KEY,
+    client VARCHAR(255) NOT NULL,
+    priority VARCHAR(50) NOT NULL,
+    hours DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
 CREATE INDEX IF NOT EXISTS idx_tickets_branch_id ON tickets(branch_id);
