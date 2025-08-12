@@ -26,3 +26,8 @@ type AuthResponse struct {
 	Token string `json:"token"`
 	Role  int64  `json:"role"`
 }
+
+type UsersToTicket struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}

@@ -155,6 +155,25 @@ func (h *UserHandler) FindByMobile(c *gin.Context) {
 	})
 }
 
+func (h *UserHandler) FindUsersToTicket(c *gin.Context) {
+	users, err := h.service.FindUsersToTicket(context.Background())
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User or role not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+		return
+	}
+
+	if len(users) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+}
+
 func (h *UserHandler) Update(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

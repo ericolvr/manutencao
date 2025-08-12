@@ -13,6 +13,7 @@ func UserRoutes(
 	{
 		routes.POST("", userHandler.Create)
 		routes.GET("", userHandler.List)
+		routes.GET("/ticket-users", userHandler.FindUsersToTicket)
 		routes.GET("/:id", userHandler.FindByID)
 		routes.PUT("/:id", userHandler.Update)
 		routes.DELETE("/:id", userHandler.Delete)

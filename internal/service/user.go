@@ -17,6 +17,7 @@ type UserService interface {
 	FindByID(ctx context.Context, id int) (*domain.User, error)
 	FindByName(ctx context.Context, name string) ([]domain.User, error)
 	FindByMobile(ctx context.Context, mobile string) ([]domain.User, error)
+	FindUsersToTicket(ctx context.Context) ([]dto.UsersToTicket, error)
 	Update(ctx context.Context, user *domain.User) error
 	Delete(ctx context.Context, id int) error
 	Authenticate(ctx context.Context, mobile, password string) (*dto.AuthResponse, error)
@@ -56,6 +57,10 @@ func (s *userService) FindByName(ctx context.Context, name string) ([]domain.Use
 
 func (s *userService) FindByMobile(ctx context.Context, mobile string) ([]domain.User, error) {
 	return s.repo.FindByMobile(ctx, mobile)
+}
+
+func (s *userService) FindUsersToTicket(ctx context.Context) ([]dto.UsersToTicket, error) {
+	return s.repo.FindUsersToTicket(ctx)
 }
 
 func (s *userService) Update(ctx context.Context, user *domain.User) error {

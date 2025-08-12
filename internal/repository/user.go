@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/ericolvr/maintenance-v2/internal/domain"
+	"github.com/ericolvr/maintenance-v2/internal/dto"
 	_ "github.com/lib/pq"
 )
 
@@ -18,6 +19,7 @@ type UserRepository interface {
 	FindByID(ctx context.Context, id int) (*domain.User, error)
 	FindByName(ctx context.Context, name string) ([]domain.User, error)
 	FindByMobile(ctx context.Context, mobile string) ([]domain.User, error)
+	FindUsersToTicket(ctx context.Context) ([]dto.UsersToTicket, error)
 	Update(ctx context.Context, user *domain.User) error
 	Delete(ctx context.Context, id int) error
 }
@@ -154,6 +156,33 @@ func (r *userRepository) FindByMobile(ctx context.Context, mobile string) ([]dom
 			&user.Password,
 			&user.Role,
 			&user.Status); err != nil {
+			return nil, fmt.Errorf("error scanning user: %w", err)
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating users: %w", err)
+	}
+
+	return users, nil
+}
+
+func (r *userRepository) FindUsersToTicket(ctx context.Context) ([]dto.UsersToTicket, error) {
+	query := `SELECT id, name FROM users WHERE (role = 1 OR role = 2) AND status = $1 ORDER BY name ASC`
+
+	rows, err := r.db.QueryContext(ctx, query, 1)
+	if err != nil {
+		return nil, fmt.Errorf("error finding users by role: %w", err)
+	}
+	defer rows.Close()
+
+	var users []dto.UsersToTicket
+	for rows.Next() {
+		var user dto.UsersToTicket
+		if err := rows.Scan(
+			&user.ID,
+			&user.Name); err != nil {
 			return nil, fmt.Errorf("error scanning user: %w", err)
 		}
 		users = append(users, user)

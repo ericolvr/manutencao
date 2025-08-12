@@ -14,11 +14,9 @@ type User struct {
 	Password string `json:"password"`
 	// ROLE
 	// 1 Admin
-	// 3 Finaceiro
+	// 2 Finaceiro
 	// 3 Suporte
-	// 4 Estoque
-	// 5 Técnicos
-	// 6 Pagamentos
+	// 4 Técnicos
 	Role   int64 `json:"role"`
 	Status bool  `json:"status"`
 }
