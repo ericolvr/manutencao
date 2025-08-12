@@ -27,6 +27,7 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	problemRepo := repository.NewProblemRepository(db)
 	solutionRepo := repository.NewSolutionRepository(db)
+	slaRepo := repository.NewSlaRepository(db)
 
 	// Services
 	branchService := service.NewBranchService(branchRepo)
@@ -38,6 +39,7 @@ func main() {
 	userService := service.NewUserService(userRepo, []byte(cfg.JWTSecret))
 	problemService := service.NewProblemService(problemRepo)
 	solutionService := service.NewSolutionService(solutionRepo, problemRepo)
+	slaService := service.NewSlaService(slaRepo)
 
 	router := gin.Default()
 
@@ -60,6 +62,7 @@ func main() {
 	routes.UserRoutes(router, handlers.NewUserHandler(userService))
 	routes.ProblemRoutes(router, handlers.NewProblemHandler(problemService))
 	routes.SolutionRoutes(router, handlers.NewSolutionHandler(solutionService))
+	routes.SlaRoutes(router, handlers.NewSlaHandler(slaService))
 
 	log.Printf(
 		"Server is running on port %s", cfg.ServerPort,

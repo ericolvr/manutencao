@@ -14,6 +14,7 @@ import (
 type TicketService interface {
 	Create(ctx context.Context, req *dto.TicketRequest) (*dto.TicketResponse, error)
 	List(ctx context.Context, limit, offset int) ([]dto.TicketResponse, int, error)
+	ListWithDetails(ctx context.Context, limit, offset int) ([]dto.TicketResponse, int, error)
 	FindByID(ctx context.Context, id int) (*dto.TicketResponse, error)
 	Update(ctx context.Context, id int, req *dto.UpdateTicketRequest) (*dto.TicketResponse, error)
 	Delete(ctx context.Context, id int) error
@@ -34,11 +35,11 @@ type TicketService interface {
 }
 
 type ticketService struct {
-	ticketRepo     repository.TicketRepository
-	branchRepo     repository.BranchRepository
-	providerRepo   repository.ProviderRepository
-	problemRepo    repository.ProblemRepository
-	solutionRepo   repository.SolutionRepository
+	ticketRepo      repository.TicketRepository
+	branchRepo      repository.BranchRepository
+	providerRepo    repository.ProviderRepository
+	problemRepo     repository.ProblemRepository
+	solutionRepo    repository.SolutionRepository
 	distanceService DistanceService
 }
 
@@ -51,11 +52,11 @@ func NewTicketService(
 	distanceService DistanceService,
 ) TicketService {
 	return &ticketService{
-		ticketRepo:     ticketRepo,
-		branchRepo:     branchRepo,
-		providerRepo:   providerRepo,
-		problemRepo:    problemRepo,
-		solutionRepo:   solutionRepo,
+		ticketRepo:      ticketRepo,
+		branchRepo:      branchRepo,
+		providerRepo:    providerRepo,
+		problemRepo:     problemRepo,
+		solutionRepo:    solutionRepo,
 		distanceService: distanceService,
 	}
 }
@@ -76,7 +77,7 @@ func (s *ticketService) Create(ctx context.Context, req *dto.TicketRequest) (*dt
 	// Criar domínio do ticket (sem provider e sem custos iniciais)
 	ticket := &domain.Ticket{
 		Number:      req.Number,
-		Status:      int(req.Status),
+		Status:      req.Status,
 		Priority:    req.Priority,
 		Description: req.Description,
 		OpenDate:    openDate,
@@ -137,6 +138,28 @@ func (s *ticketService) List(ctx context.Context, limit, offset int) ([]dto.Tick
 		}
 
 		responses = append(responses, *dto.ToTicketResponseWithBranchProviderDistanceAndCosts(&ticket, branch, provider, distanceValue, costs))
+	}
+
+	return responses, total, nil
+}
+
+func (s *ticketService) ListWithDetails(ctx context.Context, limit, offset int) ([]dto.TicketResponse, int, error) {
+	ticketsWithDetails, total, err := s.ticketRepo.ListWithDetails(ctx, limit, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to list tickets with details: %w", err)
+	}
+
+	var responses []dto.TicketResponse
+	for _, ticketDetail := range ticketsWithDetails {
+		// Buscar custos para cada ticket (única query adicional necessária)
+		costs, err := s.ticketRepo.GetTicketCosts(ctx, ticketDetail.ID)
+		if err != nil {
+			return nil, 0, fmt.Errorf("failed to get ticket costs for ticket %d: %w", ticketDetail.ID, err)
+		}
+
+		// Converter para TicketResponse usando a nova função
+		response := dto.ToTicketResponseFromDetails(&ticketDetail, costs)
+		responses = append(responses, *response)
 	}
 
 	return responses, total, nil

@@ -48,7 +48,7 @@ func (r *slaRepository) Create(ctx context.Context, sla *domain.Sla) (int, error
 }
 
 func (r *slaRepository) List(ctx context.Context) ([]domain.Sla, error) {
-	query := `SELECT id, client_id, priority, hours FROM slas ORDER BY name ASC`
+	query := `SELECT id, client_id, priority, hours FROM slas ORDER BY id ASC`
 
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
@@ -77,7 +77,7 @@ func (r *slaRepository) List(ctx context.Context) ([]domain.Sla, error) {
 }
 
 func (r *slaRepository) FindByID(ctx context.Context, id int) (*domain.Sla, error) {
-	query := `SELECT id, client_id, priority, hours FROM slas WHERE id = $1`
+	query := `SELECT id, client_id, priority, hours FROM sla WHERE id = $1`
 	var sla domain.Sla
 
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
@@ -90,14 +90,14 @@ func (r *slaRepository) FindByID(ctx context.Context, id int) (*domain.Sla, erro
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrSlaNotFound
 		}
-		return nil, fmt.Errorf("error finding branch by id: %w", err)
+		return nil, fmt.Errorf("error finding sla by id: %w", err)
 	}
 
 	return &sla, nil
 }
 
 func (r *slaRepository) GetByClient(ctx context.Context, client int) ([]domain.Sla, error) {
-	query := `SELECT id, client_id, priority, hours FROM slas WHERE client_id = $1 ORDER BY name ASC`
+	query := `SELECT id, client_id, priority, hours FROM sla WHERE client_id = $1 ORDER BY id ASC`
 
 	rows, err := r.db.QueryContext(ctx, query, client)
 	if err != nil {
@@ -126,10 +126,10 @@ func (r *slaRepository) GetByClient(ctx context.Context, client int) ([]domain.S
 }
 
 func (r *slaRepository) Update(ctx context.Context, sla *domain.Sla) error {
-	query := `UPDATE slas SET 
+	query := `UPDATE sla SET 
 			client_id = $1, 
 			priority = $2, 
-			hours = $3, 
+			hours = $3 
 			WHERE id = $4`
 
 	result, err := r.db.ExecContext(ctx, query,
@@ -147,14 +147,14 @@ func (r *slaRepository) Update(ctx context.Context, sla *domain.Sla) error {
 	}
 
 	if rowsAffected == 0 {
-		return ErrBranchNotFound
+		return ErrSlaNotFound
 	}
 
 	return nil
 }
 
 func (r *slaRepository) Delete(ctx context.Context, id int) error {
-	query := `DELETE FROM slas WHERE id = $1`
+	query := `DELETE FROM sla WHERE id = $1`
 
 	result, err := r.db.ExecContext(ctx, query, id)
 	if err != nil {
@@ -167,7 +167,7 @@ func (r *slaRepository) Delete(ctx context.Context, id int) error {
 	}
 
 	if rowsAffected == 0 {
-		return ErrBranchNotFound
+		return ErrSlaNotFound
 	}
 
 	return nil

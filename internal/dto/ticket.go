@@ -8,7 +8,7 @@ import (
 
 type TicketRequest struct {
 	Number      string `json:"number" binding:"required"`
-	Status      int64  `json:"status" binding:"required"`
+	Status      int    `json:"status" binding:"required"`
 	Priority    string `json:"priority" binding:"required"`
 	Description string `json:"description" binding:"required"`
 	OpenDate    string `json:"open_date" binding:"required"` // Formato "2006-01-02T15:04:05Z"
@@ -17,7 +17,7 @@ type TicketRequest struct {
 
 type UpdateTicketRequest struct {
 	Number        string                `json:"number" binding:"required"`
-	Status        int64                 `json:"status" binding:"required"`
+	Status        int                   `json:"status" binding:"required"`
 	Priority      string                `json:"priority" binding:"required"`
 	Description   string                `json:"description" binding:"required"`
 	OpenDate      string                `json:"open_date" binding:"required"` // Formato "2006-01-02T15:04:05Z"
@@ -224,6 +224,66 @@ func ToTicketResponseWithBranchProviderDistanceAndCosts(ticket *domain.Ticket, b
 		ProviderID:   ticket.ProviderID,
 		ProviderName: providerName,
 		Distance:     distance,
+		Costs:        costItems,
+		TotalCost:    totalCost,
+	}
+}
+
+// TicketWithDetails representa um ticket com todos os dados relacionados em uma única query
+type TicketWithDetails struct {
+	ID           int        `json:"id" db:"id"`
+	Number       string     `json:"number" db:"number"`
+	Status       int        `json:"status" db:"status"`
+	Priority     string     `json:"priority" db:"priority"`
+	Description  string     `json:"description" db:"description"`
+	OpenDate     time.Time  `json:"open_date" db:"open_date"`
+	CloseDate    *time.Time `json:"close_date,omitempty" db:"close_date"`
+	BranchID     int        `json:"branch_id" db:"branch_id"`
+	ProviderID   *int       `json:"provider_id,omitempty" db:"provider_id"`
+	CreatedAt    time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at" db:"updated_at"`
+	
+	// Dados relacionados via JOIN
+	BranchName   string     `json:"branch_name" db:"branch_name"`
+	BranchUniorg string     `json:"branch_uniorg" db:"branch_uniorg"`
+	ProviderName *string    `json:"provider_name,omitempty" db:"provider_name"`
+	Distance     *float64   `json:"distance,omitempty" db:"distance"`
+}
+
+// ToTicketResponseFromDetails converte TicketWithDetails para TicketResponse com custos
+func ToTicketResponseFromDetails(ticketDetail *TicketWithDetails, costs []domain.TicketCost) *TicketResponse {
+	if ticketDetail == nil {
+		return nil
+	}
+
+	var costItems []SolutionItemResponse
+	var totalCost float64
+
+	for _, cost := range costs {
+		costItem := SolutionItemResponse{
+			ProblemName:  cost.ProblemName,
+			SolutionName: cost.SolutionName,
+			UnitPrice:    cost.UnitPrice,
+			Subtotal:     cost.Subtotal,
+		}
+		costItems = append(costItems, costItem)
+		totalCost += cost.Subtotal
+	}
+
+	return &TicketResponse{
+		ID:           ticketDetail.ID,
+		Number:       ticketDetail.Number,
+		Status:       ticketDetail.Status,
+		Priority:     ticketDetail.Priority,
+		Description:  ticketDetail.Description,
+		OpenDate:     ticketDetail.OpenDate,
+		CloseDate:    ticketDetail.CloseDate,
+		BranchID:     ticketDetail.BranchID,
+		BranchName:   ticketDetail.BranchName,
+		BranchUniorg: ticketDetail.BranchUniorg,
+		ProviderID:   ticketDetail.ProviderID,
+		ProviderName: ticketDetail.ProviderName,
+		Distance:     ticketDetail.Distance,
 		Costs:        costItems,
 		TotalCost:    totalCost,
 	}

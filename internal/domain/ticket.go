@@ -13,8 +13,13 @@ type Ticket struct {
 	CloseDate   *time.Time `json:"close_date,omitempty" db:"close_date"`
 	BranchID    int        `json:"branch_id" db:"branch_id"`
 	ProviderID  *int       `json:"provider_id,omitempty" db:"provider_id"`
-	CreatedAt   time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at" db:"updated_at"`
+
+	// new fields (RC)
+	// ClientNumber string `json:"client_number" db:"client_number"`
+
+	// new fields (RC)
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // TicketCost representa os custos aplicados a um ticket

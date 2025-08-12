@@ -7,11 +7,13 @@ import (
 	"strconv"
 
 	"github.com/ericolvr/maintenance-v2/internal/domain"
+	"github.com/ericolvr/maintenance-v2/internal/dto"
 )
 
 type TicketRepository interface {
 	Create(ctx context.Context, ticket *domain.Ticket) (int, error)
 	List(ctx context.Context, limit, offset int) ([]domain.Ticket, int, error)
+	ListWithDetails(ctx context.Context, limit, offset int) ([]dto.TicketWithDetails, int, error)
 	FindByID(ctx context.Context, id int) (*domain.Ticket, error)
 	Update(ctx context.Context, ticket *domain.Ticket) error
 	Delete(ctx context.Context, ticketID int) error
@@ -135,6 +137,88 @@ func (r *ticketRepository) List(ctx context.Context, limit, offset int) ([]domai
 
 	if err := rows.Err(); err != nil {
 		return nil, 0, fmt.Errorf("error iterating tickets: %w", err)
+	}
+
+	return tickets, records, nil
+}
+
+func (r *ticketRepository) ListWithDetails(ctx context.Context, limit, offset int) ([]dto.TicketWithDetails, int, error) {
+	var records int
+
+	err := r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM tickets").Scan(&records)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to count tickets: %w", err)
+	}
+
+	query := `
+		SELECT 
+			t.id, t.number, t.status, t.priority, t.description, 
+			t.open_date, t.close_date, t.branch_id, t.provider_id,
+			t.created_at, t.updated_at,
+			b.name as branch_name, 
+			b.uniorg as branch_uniorg,
+			p.name as provider_name,
+			d.distance
+		FROM tickets t
+		LEFT JOIN branches b ON t.branch_id = b.id
+		LEFT JOIN providers p ON t.provider_id = p.id  
+		LEFT JOIN distances d ON t.number = d.number
+		ORDER BY t.id DESC
+		LIMIT $1 OFFSET $2
+	`
+
+	rows, err := r.db.QueryContext(ctx, query, limit, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("failed to list tickets with details: %w", err)
+	}
+	defer rows.Close()
+
+	var tickets []dto.TicketWithDetails
+	for rows.Next() {
+		var ticket dto.TicketWithDetails
+		var providerID sql.NullInt64
+		var providerName sql.NullString
+		var distance sql.NullFloat64
+		
+		if err := rows.Scan(
+			&ticket.ID,
+			&ticket.Number,
+			&ticket.Status,
+			&ticket.Priority,
+			&ticket.Description,
+			&ticket.OpenDate,
+			&ticket.CloseDate,
+			&ticket.BranchID,
+			&providerID,
+			&ticket.CreatedAt,
+			&ticket.UpdatedAt,
+			&ticket.BranchName,
+			&ticket.BranchUniorg,
+			&providerName,
+			&distance,
+		); err != nil {
+			return nil, 0, fmt.Errorf("error scanning ticket with details: %w", err)
+		}
+
+		// Handle nullable fields
+		if providerID.Valid {
+			providerIDValue := int(providerID.Int64)
+			ticket.ProviderID = &providerIDValue
+		}
+		
+		if providerName.Valid {
+			ticket.ProviderName = &providerName.String
+		}
+		
+		if distance.Valid {
+			ticket.Distance = &distance.Float64
+		}
+
+		tickets = append(tickets, ticket)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("error iterating tickets with details: %w", err)
 	}
 
 	return tickets, records, nil
