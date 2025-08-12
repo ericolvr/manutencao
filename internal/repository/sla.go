@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/ericolvr/maintenance-v2/internal/domain"
+	"github.com/ericolvr/maintenance-v2/internal/dto"
 	_ "github.com/lib/pq"
 )
 
@@ -15,8 +16,9 @@ var ErrSlaNotFound = errors.New("sla not found")
 type SlaRepository interface {
 	Create(ctx context.Context, sla *domain.Sla) (int, error)
 	List(ctx context.Context) ([]domain.Sla, error)
+	ListWithClientNames(ctx context.Context) ([]dto.SlaWithClient, error)
 	FindByID(ctx context.Context, id int) (*domain.Sla, error)
-	GetByClient(ctx context.Context, client int) ([]domain.Sla, error)
+	FindByParams(ctx context.Context, client_id int, priority int) (*dto.SlaJustHours, error)
 	Update(ctx context.Context, sla *domain.Sla) error
 	Delete(ctx context.Context, id int) error
 }
@@ -76,6 +78,46 @@ func (r *slaRepository) List(ctx context.Context) ([]domain.Sla, error) {
 	return slas, nil
 }
 
+func (r *slaRepository) ListWithClientNames(ctx context.Context) ([]dto.SlaWithClient, error) {
+	query := `
+		SELECT 
+			s.id, 
+			s.client_id, 
+			c.name as client_name,
+			s.priority, 
+			s.hours 
+		FROM slas s
+		LEFT JOIN clients c ON s.client_id = c.id
+		ORDER BY s.id ASC
+	`
+
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, fmt.Errorf("error listing slas with client names: %w", err)
+	}
+	defer rows.Close()
+
+	var slas []dto.SlaWithClient
+	for rows.Next() {
+		var sla dto.SlaWithClient
+		if err := rows.Scan(
+			&sla.ID,
+			&sla.ClientID,
+			&sla.ClientName,
+			&sla.Priority,
+			&sla.Hours); err != nil {
+			return nil, fmt.Errorf("error scanning sla with client: %w", err)
+		}
+		slas = append(slas, sla)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating slas with client names: %w", err)
+	}
+
+	return slas, nil
+}
+
 func (r *slaRepository) FindByID(ctx context.Context, id int) (*domain.Sla, error) {
 	query := `SELECT id, client_id, priority, hours FROM sla WHERE id = $1`
 	var sla domain.Sla
@@ -96,37 +138,25 @@ func (r *slaRepository) FindByID(ctx context.Context, id int) (*domain.Sla, erro
 	return &sla, nil
 }
 
-func (r *slaRepository) GetByClient(ctx context.Context, client int) ([]domain.Sla, error) {
-	query := `SELECT id, client_id, priority, hours FROM sla WHERE client_id = $1 ORDER BY id ASC`
+func (r *slaRepository) FindByParams(ctx context.Context, client_id int, priority int) (*dto.SlaJustHours, error) {
+	query := `SELECT hours FROM slas WHERE client_id = $1 AND priority = $2`
+	var slaHours dto.SlaJustHours
 
-	rows, err := r.db.QueryContext(ctx, query, client)
+	err := r.db.QueryRowContext(ctx, query, client_id, priority).Scan(
+		&slaHours.Hours,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("error getting slas by client: %w", err)
-	}
-	defer rows.Close()
-
-	var slas []domain.Sla
-	for rows.Next() {
-		var sla domain.Sla
-		if err := rows.Scan(
-			&sla.ID,
-			&sla.ClientID,
-			&sla.Priority,
-			&sla.Hours); err != nil {
-			return nil, fmt.Errorf("error scanning sla: %w", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrSlaNotFound
 		}
-		slas = append(slas, sla)
+		return nil, fmt.Errorf("error finding sla by params: %w", err)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("error iterating slas: %w", err)
-	}
-
-	return slas, nil
+	return &slaHours, nil
 }
 
 func (r *slaRepository) Update(ctx context.Context, sla *domain.Sla) error {
-	query := `UPDATE sla SET 
+	query := `UPDATE slas SET 
 			client_id = $1, 
 			priority = $2, 
 			hours = $3 

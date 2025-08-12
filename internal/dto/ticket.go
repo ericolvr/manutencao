@@ -13,6 +13,9 @@ type TicketRequest struct {
 	Description string `json:"description" binding:"required"`
 	OpenDate    string `json:"open_date" binding:"required"` // Formato "2006-01-02T15:04:05Z"
 	BranchID    int    `json:"branch_id" binding:"required"`
+	// ClientNumber  string     `json:"client_number" db:"client_number"`         // numero de chamado do cliente
+	// SupportPeople string     `json:"support_people" db:"support_people"`       // pessoa do suporte responsavel pelo atendimento
+	// SlaEndDate    *time.Time `json:"sla_end_date,omitempty" db:"sla_end_date"` // Data de término do SLA
 }
 
 type UpdateTicketRequest struct {
@@ -231,23 +234,23 @@ func ToTicketResponseWithBranchProviderDistanceAndCosts(ticket *domain.Ticket, b
 
 // TicketWithDetails representa um ticket com todos os dados relacionados em uma única query
 type TicketWithDetails struct {
-	ID           int        `json:"id" db:"id"`
-	Number       string     `json:"number" db:"number"`
-	Status       int        `json:"status" db:"status"`
-	Priority     string     `json:"priority" db:"priority"`
-	Description  string     `json:"description" db:"description"`
-	OpenDate     time.Time  `json:"open_date" db:"open_date"`
-	CloseDate    *time.Time `json:"close_date,omitempty" db:"close_date"`
-	BranchID     int        `json:"branch_id" db:"branch_id"`
-	ProviderID   *int       `json:"provider_id,omitempty" db:"provider_id"`
-	CreatedAt    time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at" db:"updated_at"`
-	
+	ID          int        `json:"id" db:"id"`
+	Number      string     `json:"number" db:"number"`
+	Status      int        `json:"status" db:"status"`
+	Priority    string     `json:"priority" db:"priority"`
+	Description string     `json:"description" db:"description"`
+	OpenDate    time.Time  `json:"open_date" db:"open_date"`
+	CloseDate   *time.Time `json:"close_date,omitempty" db:"close_date"`
+	BranchID    int        `json:"branch_id" db:"branch_id"`
+	ProviderID  *int       `json:"provider_id,omitempty" db:"provider_id"`
+	CreatedAt   time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at" db:"updated_at"`
+
 	// Dados relacionados via JOIN
-	BranchName   string     `json:"branch_name" db:"branch_name"`
-	BranchUniorg string     `json:"branch_uniorg" db:"branch_uniorg"`
-	ProviderName *string    `json:"provider_name,omitempty" db:"provider_name"`
-	Distance     *float64   `json:"distance,omitempty" db:"distance"`
+	BranchName   string   `json:"branch_name" db:"branch_name"`
+	BranchUniorg string   `json:"branch_uniorg" db:"branch_uniorg"`
+	ProviderName *string  `json:"provider_name,omitempty" db:"provider_name"`
+	Distance     *float64 `json:"distance,omitempty" db:"distance"`
 }
 
 // ToTicketResponseFromDetails converte TicketWithDetails para TicketResponse com custos

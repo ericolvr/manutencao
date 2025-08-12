@@ -14,7 +14,7 @@ func SlaRoutes(
 		routes.POST("", slaHandler.Create)
 		routes.GET("", slaHandler.List)
 		routes.GET("/:id", slaHandler.FindByID)
-		routes.GET("/client/:client", slaHandler.GetByClient)
+		routes.GET("/client/:client/priority/:priority", slaHandler.FindByParams)
 		routes.PUT("/:id", slaHandler.Update)
 		routes.DELETE("/:id", slaHandler.Delete)
 	}

@@ -15,9 +15,10 @@ type Ticket struct {
 	ProviderID  *int       `json:"provider_id,omitempty" db:"provider_id"`
 
 	// new fields (RC)
-	// ClientNumber string `json:"client_number" db:"client_number"`
+	// ClientNumber  string     `json:"client_number" db:"client_number"`         // numero de chamado do cliente
+	// SupportPeople string     `json:"support_people" db:"support_people"`       // pessoa do suporte responsavel pelo atendimento
+	// SlaEndDate    *time.Time `json:"sla_end_date,omitempty" db:"sla_end_date"` // Data de término do SLA
 
-	// new fields (RC)
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }

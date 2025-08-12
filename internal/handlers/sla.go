@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -49,23 +50,15 @@ func (h *SlaHandler) Create(c *gin.Context) {
 }
 
 func (h *SlaHandler) List(c *gin.Context) {
-	slas, err := h.service.List(context.Background())
+	slas, err := h.service.ListWithClientNames(context.Background())
 	if err != nil {
+		// Log do erro específico para debug
+		fmt.Printf("Error in SLA List handler: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to list slas"})
 		return
 	}
 
-	response := make([]dto.SlaResponse, 0, len(slas))
-	for _, sla := range slas {
-		response = append(response, dto.SlaResponse{
-			ID:       sla.ID,
-			ClientID: sla.ClientID,
-			Priority: sla.Priority,
-			Hours:    sla.Hours,
-		})
-	}
-
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, slas)
 }
 
 func (h *SlaHandler) FindByID(c *gin.Context) {
@@ -94,7 +87,7 @@ func (h *SlaHandler) FindByID(c *gin.Context) {
 	})
 }
 
-func (h *SlaHandler) GetByClient(c *gin.Context) {
+func (h *SlaHandler) FindByParams(c *gin.Context) {
 	client := c.Param("client")
 	client_id, err := strconv.Atoi(client)
 	if err != nil {
@@ -102,23 +95,20 @@ func (h *SlaHandler) GetByClient(c *gin.Context) {
 		return
 	}
 
-	slas, err := h.service.GetByClient(context.Background(), client_id)
+	priorityStr := c.Param("priority")
+	priority, err := strconv.Atoi(priorityStr)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get slas by client"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid priority ID"})
 		return
 	}
 
-	response := make([]dto.SlaResponse, 0, len(slas))
-	for _, sla := range slas {
-		response = append(response, dto.SlaResponse{
-			ID:       sla.ID,
-			ClientID: sla.ClientID,
-			Priority: sla.Priority,
-			Hours:    sla.Hours,
-		})
+	sla, err := h.service.FindByParams(context.Background(), client_id, priority)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get sla by params"})
+		return
 	}
 
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, sla)
 }
 
 func (h *SlaHandler) Update(c *gin.Context) {
