@@ -37,6 +37,9 @@ type TicketRepository interface {
 	AddSolutionToTicket(ctx context.Context, ticketID int, solutionID int, quantity int) error
 	GetTicketSolutions(ctx context.Context, ticketID int) ([]domain.TicketCost, error)
 	RemoveSolutionFromTicket(ctx context.Context, ticketID int, solutionID int) error
+
+	AddKilometersValueToTicket(ctx context.Context, ticketID int, kilometers float64) error
+	RemoveKilometersValueFromTicket(ctx context.Context, ticketID int) error
 }
 
 type ticketRepository struct {
@@ -179,7 +182,7 @@ func (r *ticketRepository) ListWithDetails(ctx context.Context, limit, offset in
 		var providerID sql.NullInt64
 		var providerName sql.NullString
 		var distance sql.NullFloat64
-		
+
 		if err := rows.Scan(
 			&ticket.ID,
 			&ticket.Number,
@@ -205,11 +208,11 @@ func (r *ticketRepository) ListWithDetails(ctx context.Context, limit, offset in
 			providerIDValue := int(providerID.Int64)
 			ticket.ProviderID = &providerIDValue
 		}
-		
+
 		if providerName.Valid {
 			ticket.ProviderName = &providerName.String
 		}
-		
+
 		if distance.Valid {
 			ticket.Distance = &distance.Float64
 		}
@@ -542,7 +545,6 @@ func (r *ticketRepository) AddProblemToTicket(ctx context.Context, ticketID int,
 	return nil
 }
 
-// GetTicketProblems retorna todos os problemas associados a um ticket
 func (r *ticketRepository) GetTicketProblems(ctx context.Context, ticketID int) ([]domain.TicketProblem, error) {
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT tp.id, tp.ticket_id, tp.problem_id, tp.created_at
@@ -589,6 +591,49 @@ func (r *ticketRepository) RemoveProblemFromTicket(ctx context.Context, ticketID
 
 	if rowsAffected == 0 {
 		return fmt.Errorf("problem not found in ticket")
+	}
+
+	return nil
+}
+
+func (r *ticketRepository) AddKilometersValueToTicket(ctx context.Context, ticketID int, kilometers float64) error {
+	_, err := r.db.ExecContext(ctx, `
+		INSERT INTO ticket_costs (ticket_id, problem_id, problem_name, solution_id, solution_name, quantity, unit_price, subtotal) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+		ticketID,       // ticket_id
+		0,              // problem_id = 0 (não é um problema do catálogo)
+		"Kilometragem", // problem_name
+		0,              // solution_id = 0 (não é uma solução do catálogo)
+		"Kilometragem", // solution_name
+		1,              // quantity = 1 (uma única entrada de kilometragem)
+		kilometers,     // unit_price = valor da kilometragem
+		kilometers,     // subtotal = mesmo valor (quantity * unit_price = 1 * kilometers)
+	)
+	if err != nil {
+		return fmt.Errorf("failed to insert kilometers cost: %w", err)
+	}
+
+	return nil
+}
+
+// remove o custo de kilometragem de um ticket (problem_id = 0 e solution_id = 0)
+func (r *ticketRepository) RemoveKilometersValueFromTicket(ctx context.Context, ticketID int) error {
+	result, err := r.db.ExecContext(ctx, `
+		DELETE FROM ticket_costs 
+		WHERE ticket_id = $1 AND problem_id = 0 AND solution_id = 0`,
+		ticketID,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to remove kilometers cost: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("kilometers cost not found for ticket %d", ticketID)
 	}
 
 	return nil

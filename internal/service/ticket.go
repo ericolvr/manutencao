@@ -32,6 +32,10 @@ type TicketService interface {
 	AddSolutionToTicket(ctx context.Context, ticketID int, req *dto.TicketSolutionRequest) error
 	GetTicketSolutions(ctx context.Context, ticketID int) ([]dto.TicketSolutionResponse, error)
 	RemoveSolutionFromTicket(ctx context.Context, ticketID int, solutionID int) error
+
+	// Ticket Distance methods
+	AddKilometersValueToTicket(ctx context.Context, ticketID int, kilometers float64) error
+	RemoveKilometersValueFromTicket(ctx context.Context, ticketID int) error
 }
 
 type ticketService struct {
@@ -415,7 +419,6 @@ func (s *ticketService) GetTicketProblems(ctx context.Context, ticketID int) ([]
 		return nil, fmt.Errorf("ticket not found: %w", err)
 	}
 
-	// Buscar problemas do ticket
 	ticketProblems, err := s.ticketRepo.GetTicketProblems(ctx, ticketID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get ticket problems: %w", err)
@@ -465,6 +468,40 @@ func (s *ticketService) RemoveProblemFromTicket(ctx context.Context, ticketID in
 	err = s.ticketRepo.RemoveProblemFromTicket(ctx, ticketID, problemID)
 	if err != nil {
 		return fmt.Errorf("failed to remove problem from ticket: %w", err)
+	}
+
+	return nil
+}
+
+// AddKilometersValueToTicket adiciona um custo de kilometragem a um ticket
+func (s *ticketService) AddKilometersValueToTicket(ctx context.Context, ticketID int, kilometers float64) error {
+	// Verificar se ticket existe
+	_, err := s.ticketRepo.FindByID(ctx, ticketID)
+	if err != nil {
+		return fmt.Errorf("ticket not found: %w", err)
+	}
+
+	// Adicionar custo de kilometragem
+	err = s.ticketRepo.AddKilometersValueToTicket(ctx, ticketID, kilometers)
+	if err != nil {
+		return fmt.Errorf("failed to add kilometers value to ticket: %w", err)
+	}
+
+	return nil
+}
+
+// RemoveKilometersValueFromTicket remove o custo de kilometragem de um ticket
+func (s *ticketService) RemoveKilometersValueFromTicket(ctx context.Context, ticketID int) error {
+	// Verificar se ticket existe
+	_, err := s.ticketRepo.FindByID(ctx, ticketID)
+	if err != nil {
+		return fmt.Errorf("ticket not found: %w", err)
+	}
+
+	// Remover custo de kilometragem
+	err = s.ticketRepo.RemoveKilometersValueFromTicket(ctx, ticketID)
+	if err != nil {
+		return fmt.Errorf("failed to remove kilometers value from ticket: %w", err)
 	}
 
 	return nil

@@ -1,8 +1,8 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/ericolvr/maintenance-v2/internal/handlers"
+	"github.com/gin-gonic/gin"
 )
 
 func TicketRoutes(router *gin.Engine, ticketHandler *handlers.TicketHandler, ticketProblemHandler *handlers.TicketProblemHandler, ticketSolutionHandler *handlers.TicketSolutionHandler) {
@@ -32,5 +32,9 @@ func TicketRoutes(router *gin.Engine, ticketHandler *handlers.TicketHandler, tic
 		tickets.POST("/:id/solutions", ticketSolutionHandler.AddSolutionToTicket)
 		tickets.GET("/:id/solutions", ticketSolutionHandler.GetTicketSolutions)
 		tickets.DELETE("/:id/solutions/:solution_id", ticketSolutionHandler.RemoveSolutionFromTicket)
+
+		// Gerenciamento de kilometragem
+		tickets.POST("/:id/kilometers", ticketHandler.AddKilometersValueToTicket)
+		tickets.DELETE("/:id/kilometers", ticketHandler.RemoveKilometersValueFromTicket)
 	}
 }

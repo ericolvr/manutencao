@@ -170,3 +170,41 @@ func (h *TicketHandler) GetProviderOnTicket(c *gin.Context) {
 
 	c.JSON(http.StatusOK, provider)
 }
+
+func (h *TicketHandler) AddKilometersValueToTicket(c *gin.Context) {
+	ticketID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ticket ID"})
+		return
+	}
+
+	var req dto.AddKilometersValueToTicket
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = h.ticketService.AddKilometersValueToTicket(c.Request.Context(), ticketID, req.Kilometers)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Kilometers value added successfully"})
+}
+
+func (h *TicketHandler) RemoveKilometersValueFromTicket(c *gin.Context) {
+	ticketID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ticket ID"})
+		return
+	}
+
+	err = h.ticketService.RemoveKilometersValueFromTicket(c.Request.Context(), ticketID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Kilometers value removed successfully"})
+}

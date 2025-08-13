@@ -2,7 +2,7 @@ package dto
 
 import "github.com/ericolvr/maintenance-v2/internal/domain"
 
-// SolutionRequest representa uma requisição para criar/atualizar solução
+// representa uma requisição para criar/atualizar solução
 type SolutionRequest struct {
 	Name        string  `json:"name" binding:"required"`
 	Description string  `json:"description"`
@@ -10,7 +10,7 @@ type SolutionRequest struct {
 	ProblemID   int     `json:"problem_id" binding:"required"`
 }
 
-// SolutionResponse representa uma solução na resposta
+// representa uma solução na resposta
 type SolutionResponse struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name"`
@@ -19,7 +19,7 @@ type SolutionResponse struct {
 	ProblemID   int     `json:"problem_id"`
 }
 
-// ToSolutionDomain converte DTO para domain
+// converte DTO para domain
 func (r *SolutionRequest) ToSolutionDomain() *domain.Solution {
 	return &domain.Solution{
 		Name:        r.Name,
@@ -29,12 +29,12 @@ func (r *SolutionRequest) ToSolutionDomain() *domain.Solution {
 	}
 }
 
-// ToSolutionResponse converte domain para DTO
+// converte domain para DTO
 func ToSolutionResponse(solution *domain.Solution) *SolutionResponse {
 	if solution == nil {
 		return nil
 	}
-	
+
 	return &SolutionResponse{
 		ID:          solution.ID,
 		Name:        solution.Name,
@@ -44,7 +44,7 @@ func ToSolutionResponse(solution *domain.Solution) *SolutionResponse {
 	}
 }
 
-// ToSolutionResponseList converte lista de domain para DTO
+// converte lista de domain para DTO
 func ToSolutionResponseList(solutions []domain.Solution) []SolutionResponse {
 	responses := make([]SolutionResponse, len(solutions))
 	for i, solution := range solutions {
@@ -52,5 +52,3 @@ func ToSolutionResponseList(solutions []domain.Solution) []SolutionResponse {
 	}
 	return responses
 }
-
-

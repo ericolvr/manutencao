@@ -48,14 +48,14 @@ type TicketResponse struct {
 	TotalCost    float64                `json:"total_cost"`
 }
 
-// SolutionItemRequest representa um item de solução na requisição
+// representa um item de solução na requisição
 type SolutionItemRequest struct {
 	Description string  `json:"description" binding:"required"`
 	UnitPrice   float64 `json:"unit_price" binding:"required"`
 	Quantity    int     `json:"quantity" binding:"required"`
 }
 
-// SolutionItemResponse representa um item de solução na resposta
+// representa um item de solução na resposta
 type SolutionItemResponse struct {
 	ProblemName  string  `json:"problem_name"`
 	SolutionName string  `json:"solution_name"`
@@ -63,7 +63,7 @@ type SolutionItemResponse struct {
 	Subtotal     float64 `json:"subtotal"`
 }
 
-// MapToTicketResponse mapeia um domínio Ticket para sua representação DTO TicketResponse
+// mapeia um domínio Ticket para sua representação DTO TicketResponse
 func ToTicketResponse(ticket *domain.Ticket) *TicketResponse {
 	if ticket == nil {
 		return nil
@@ -85,7 +85,7 @@ func ToTicketResponse(ticket *domain.Ticket) *TicketResponse {
 	}
 }
 
-// ToTicketResponseWithCosts mapeia um domínio Ticket com seus custos para TicketResponse
+// mapeia um domínio Ticket com seus custos para TicketResponse
 func ToTicketResponseWithCosts(ticket *domain.Ticket, costs []domain.TicketCost) *TicketResponse {
 	if ticket == nil {
 		return nil
@@ -121,7 +121,7 @@ func ToTicketResponseWithCosts(ticket *domain.Ticket, costs []domain.TicketCost)
 	}
 }
 
-// ToTicketResponseWithDistanceAndCosts mapeia um domínio Ticket com distance e custos para TicketResponse
+// mapeia um domínio Ticket com distance e custos para TicketResponse
 func ToTicketResponseWithDistanceAndCosts(ticket *domain.Ticket, distance *float64, costs []domain.TicketCost) *TicketResponse {
 	if ticket == nil {
 		return nil
@@ -160,26 +160,26 @@ func ToTicketResponseWithDistanceAndCosts(ticket *domain.Ticket, distance *float
 	}
 }
 
-// AddProviderRequest contém o ID do provider a ser adicionado ao ticket
+// contém o ID do provider a ser adicionado ao ticket
 type AddProviderRequest struct {
 	ProviderID int `json:"provider_id" binding:"required"`
 }
 
-// AddSolutionItemRequest contém dados para adicionar item de solução ao ticket
+// contém dados para adicionar item de solução ao ticket
 type AddSolutionItemRequest struct {
 	Description string  `json:"description" binding:"required"`
 	UnitPrice   float64 `json:"unit_price" binding:"required"`
 	Quantity    int     `json:"quantity" binding:"required"`
 }
 
-// UpdateSolutionItemRequest contém dados para atualizar item de solução
+// contém dados para atualizar item de solução
 type UpdateSolutionItemRequest struct {
 	Description string  `json:"description" binding:"required"`
 	UnitPrice   float64 `json:"unit_price" binding:"required"`
 	Quantity    int     `json:"quantity" binding:"required"`
 }
 
-// ToTicketResponseWithBranchProviderDistanceAndCosts mapeia um domínio Ticket com branch, provider, distance e custos para TicketResponse
+// mapeia um domínio Ticket com branch, provider, distance e custos para TicketResponse
 func ToTicketResponseWithBranchProviderDistanceAndCosts(ticket *domain.Ticket, branch *domain.Branch, provider *domain.Provider, distance *float64, costs []domain.TicketCost) *TicketResponse {
 	if ticket == nil {
 		return nil
@@ -232,7 +232,7 @@ func ToTicketResponseWithBranchProviderDistanceAndCosts(ticket *domain.Ticket, b
 	}
 }
 
-// TicketWithDetails representa um ticket com todos os dados relacionados em uma única query
+// representa um ticket com todos os dados relacionados em uma única query
 type TicketWithDetails struct {
 	ID          int        `json:"id" db:"id"`
 	Number      string     `json:"number" db:"number"`
@@ -253,7 +253,7 @@ type TicketWithDetails struct {
 	Distance     *float64 `json:"distance,omitempty" db:"distance"`
 }
 
-// ToTicketResponseFromDetails converte TicketWithDetails para TicketResponse com custos
+// converte TicketWithDetails para TicketResponse com custos
 func ToTicketResponseFromDetails(ticketDetail *TicketWithDetails, costs []domain.TicketCost) *TicketResponse {
 	if ticketDetail == nil {
 		return nil
@@ -290,4 +290,9 @@ func ToTicketResponseFromDetails(ticketDetail *TicketWithDetails, costs []domain
 		Costs:        costItems,
 		TotalCost:    totalCost,
 	}
+}
+
+// DTO para adicionar valor de kilometragem a um ticket - tabela ticket_costs
+type AddKilometersValueToTicket struct {
+	Kilometers float64 `json:"kilometers" binding:"required"`
 }

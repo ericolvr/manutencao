@@ -23,7 +23,6 @@ type Ticket struct {
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
-// TicketCost representa os custos aplicados a um ticket
 type TicketCost struct {
 	ID           int       `json:"id" db:"id"`
 	TicketID     int       `json:"ticket_id" db:"ticket_id"`
